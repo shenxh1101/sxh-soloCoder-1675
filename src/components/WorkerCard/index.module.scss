@@ -1,0 +1,118 @@
+@use '@/styles/variables.scss' as *;
+
+.card {
+  background-color: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  margin-bottom: $spacing-md;
+  box-shadow: $shadow-card;
+  display: flex;
+  align-items: center;
+  gap: $spacing-lg;
+  transition: all $transition-base;
+
+  &:active {
+    opacity: 0.9;
+  }
+}
+
+.selected {
+  border: 2rpx solid $color-primary;
+  background-color: $color-primary-bg;
+}
+
+.avatar {
+  width: 96rpx;
+  height: 96rpx;
+  border-radius: $radius-round;
+  background-color: $color-bg-hover;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.avatarImg {
+  width: 100%;
+  height: 100%;
+}
+
+.info {
+  flex: 1;
+  min-width: 0;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: $spacing-xs;
+}
+
+.name {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+}
+
+.phone {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  margin-bottom: $spacing-sm;
+}
+
+.skills {
+  display: flex;
+  gap: $spacing-xs;
+  flex-wrap: wrap;
+  margin-bottom: $spacing-sm;
+}
+
+.skillTag {
+  display: inline-flex;
+  align-items: center;
+  padding: 2rpx 12rpx;
+  border-radius: $radius-xs;
+  font-size: 20rpx;
+  background-color: $color-bg-hover;
+  color: $color-text-secondary;
+}
+
+.stats {
+  display: flex;
+  gap: $spacing-lg;
+}
+
+.statItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.statValue {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+}
+
+.statLabel {
+  font-size: 20rpx;
+  color: $color-text-tertiary;
+}
+
+.loadBar {
+  margin-top: $spacing-sm;
+  height: 8rpx;
+  border-radius: $radius-round;
+  background-color: $color-bg-hover;
+  overflow: hidden;
+}
+
+.loadFill {
+  height: 100%;
+  border-radius: $radius-round;
+  background-color: $color-warning;
+  transition: width $transition-base;
+}
+
+.loadHigh {
+  background-color: $color-error;
+}

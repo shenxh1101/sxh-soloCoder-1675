@@ -1,0 +1,42 @@
+@use '@/styles/variables.scss' as *;
+
+.page {
+  min-height: 100vh;
+  background-color: $color-bg-page;
+}
+
+.filterBar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background-color: $color-bg-card;
+  padding: $spacing-md $page-padding;
+  display: flex;
+  gap: $spacing-sm;
+  overflow-x: auto;
+  border-bottom: 1rpx solid $color-divider;
+  box-shadow: $shadow-card;
+}
+
+.filterItem {
+  flex-shrink: 0;
+  padding: $spacing-sm $spacing-lg;
+  border-radius: $radius-button;
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  background-color: $color-bg-hover;
+  transition: all $transition-base;
+
+  &:active {
+    opacity: 0.8;
+  }
+}
+
+.filterItemActive {
+  background-color: $color-primary;
+  color: $color-text-white;
+}
+
+.orderList {
+  padding: $spacing-lg $page-padding $spacing-xl * 2;
+}

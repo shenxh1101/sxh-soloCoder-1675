@@ -1,0 +1,67 @@
+@use '@/styles/variables.scss' as *;
+
+.timeline {
+  padding-left: $spacing-md;
+}
+
+.timelineItem {
+  position: relative;
+  padding-left: $spacing-xl;
+  padding-bottom: $spacing-lg;
+
+  &:last-child {
+    padding-bottom: 0;
+  }
+}
+
+.dot {
+  position: absolute;
+  left: 0;
+  top: 8rpx;
+  width: 20rpx;
+  height: 20rpx;
+  border-radius: $radius-round;
+  background-color: $color-primary;
+  z-index: 1;
+}
+
+.line {
+  position: absolute;
+  left: 9rpx;
+  top: 28rpx;
+  bottom: 0;
+  width: 2rpx;
+  background-color: $color-border;
+
+  :global(.timeline-item:last-child) & {
+    display: none;
+  }
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-xs;
+}
+
+.description {
+  font-size: $font-size-sm;
+  color: $color-text-primary;
+  font-weight: $font-weight-medium;
+}
+
+.meta {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+}
+
+.time {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+}
+
+.operator {
+  font-size: $font-size-xs;
+  color: $color-text-secondary;
+}

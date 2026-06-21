@@ -1,0 +1,195 @@
+@use '@/styles/variables.scss' as *;
+
+.page {
+  min-height: 100vh;
+  background-color: $color-bg-page;
+  padding-bottom: $spacing-xl * 2;
+}
+
+.header {
+  background: linear-gradient(135deg, $color-primary 0%, $color-primary-light 100%);
+  padding: $spacing-xl * 1.5 $page-padding $spacing-xl * 2;
+}
+
+.userCard {
+  display: flex;
+  align-items: center;
+  gap: $spacing-lg;
+}
+
+.avatar {
+  width: 144rpx;
+  height: 144rpx;
+  border-radius: $radius-round;
+  background-color: $color-bg-card;
+  overflow: hidden;
+  border: 4rpx solid rgba(255, 255, 255, 0.3);
+  box-shadow: $shadow-float;
+}
+
+.avatarImg {
+  width: 100%;
+  height: 100%;
+}
+
+.userInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.userName {
+  font-size: $font-size-xxl;
+  font-weight: $font-weight-bold;
+  color: $color-text-white;
+  margin-bottom: $spacing-xs;
+}
+
+.userMeta {
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+  flex-wrap: wrap;
+}
+
+.roleBadge {
+  display: inline-flex;
+  align-items: center;
+  padding: 6rpx 20rpx;
+  border-radius: $radius-round;
+  background-color: rgba(255, 255, 255, 0.25);
+  font-size: $font-size-sm;
+  color: $color-text-white;
+  font-weight: $font-weight-medium;
+}
+
+.userPhone {
+  font-size: $font-size-sm;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.content {
+  padding: 0 $page-padding;
+  margin-top: -$spacing-lg;
+}
+
+.statsCard {
+  background-color: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  box-shadow: $shadow-card;
+  display: flex;
+  margin-bottom: $spacing-lg;
+}
+
+.statItem {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: $spacing-xs;
+  position: relative;
+
+  &:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 1rpx;
+    height: 60rpx;
+    background-color: $color-divider;
+  }
+}
+
+.statValue {
+  font-size: 40rpx;
+  font-weight: $font-weight-bold;
+  color: $color-text-primary;
+}
+
+.statLabel {
+  font-size: $font-size-xs;
+  color: $color-text-secondary;
+}
+
+.menuCard {
+  background-color: $color-bg-card;
+  border-radius: $radius-lg;
+  overflow: hidden;
+  box-shadow: $shadow-card;
+  margin-bottom: $spacing-lg;
+}
+
+.menuGroupTitle {
+  padding: $spacing-md $spacing-lg;
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+  background-color: $color-bg-card;
+}
+
+.menuItem {
+  display: flex;
+  align-items: center;
+  padding: $spacing-lg;
+  border-top: 1rpx solid $color-divider;
+  transition: all $transition-base;
+  gap: $spacing-md;
+
+  &:active {
+    background-color: $color-bg-hover;
+  }
+}
+
+.menuIcon {
+  width: 64rpx;
+  height: 64rpx;
+  border-radius: $radius-md;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 36rpx;
+  flex-shrink: 0;
+}
+
+.iconBlue {
+  background-color: #E6F4FF;
+  color: #1677FF;
+}
+
+.iconGreen {
+  background-color: #F6FFED;
+  color: #52C41A;
+}
+
+.iconOrange {
+  background-color: #FFF7E6;
+  color: #FAAD14;
+}
+
+.iconPurple {
+  background-color: #F9F0FF;
+  color: #722ED1;
+}
+
+.iconGray {
+  background-color: #F5F5F5;
+  color: #8C8C8C;
+}
+
+.menuLabel {
+  flex: 1;
+  font-size: $font-size-md;
+  color: $color-text-primary;
+}
+
+.menuArrow {
+  font-size: $font-size-md;
+  color: $color-text-tertiary;
+}
+
+.version {
+  text-align: center;
+  padding-top: $spacing-xl;
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+}

@@ -1,0 +1,84 @@
+@use '@/styles/variables.scss' as *;
+
+.page {
+  min-height: 100vh;
+  background-color: $color-bg-page;
+  padding-bottom: 200rpx;
+}
+
+.tip {
+  padding: $spacing-md $page-padding;
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  background-color: $color-primary-bg;
+}
+
+.workerList {
+  padding: $spacing-md $page-padding;
+}
+
+.skillFilter {
+  display: flex;
+  gap: $spacing-sm;
+  padding: $spacing-md $page-padding;
+  overflow-x: auto;
+  background-color: $color-bg-card;
+  margin-bottom: $spacing-sm;
+}
+
+.filterChip {
+  flex-shrink: 0;
+  padding: $spacing-xs $spacing-md;
+  border-radius: $radius-button;
+  font-size: $font-size-xs;
+  color: $color-text-secondary;
+  background-color: $color-bg-hover;
+  transition: all $transition-base;
+
+  &:active {
+    opacity: 0.8;
+  }
+}
+
+.filterChipActive {
+  background-color: $color-primary;
+  color: $color-text-white;
+}
+
+.footerBar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: $spacing-md $page-padding;
+  padding-bottom: calc($spacing-md + env(safe-area-inset-bottom));
+  background-color: $color-bg-card;
+  box-shadow: 0 -2rpx 12rpx rgba(0, 0, 0, 0.06);
+  display: flex;
+  gap: $spacing-md;
+}
+
+.btn {
+  @include button-reset;
+  flex: 1;
+  height: $button-height-lg;
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  border-radius: $radius-button;
+  transition: all $transition-base;
+
+  &:active {
+    opacity: 0.9;
+    transform: scale(0.98);
+  }
+}
+
+.btnPrimary {
+  background: linear-gradient(135deg, $color-primary 0%, $color-primary-light 100%);
+  color: $color-text-white;
+}
+
+.btnDisabled {
+  background: $color-text-disabled;
+  color: $color-text-white;
+}

@@ -1,0 +1,229 @@
+@use '@/styles/variables.scss' as *;
+
+.page {
+  min-height: 100vh;
+  background: linear-gradient(180deg, #E6F0FF 0%, $color-bg-page 30%);
+  padding-bottom: $spacing-xl * 2;
+}
+
+.header {
+  padding: $spacing-lg $page-padding $spacing-xl;
+}
+
+.greeting {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: $spacing-lg;
+}
+
+.userInfo {
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+}
+
+.avatar {
+  width: 88rpx;
+  height: 88rpx;
+  border-radius: $radius-round;
+  background-color: $color-bg-card;
+  overflow: hidden;
+  box-shadow: $shadow-card;
+}
+
+.avatarImg {
+  width: 100%;
+  height: 100%;
+}
+
+.greetingText {
+  display: flex;
+  flex-direction: column;
+  gap: 4rpx;
+}
+
+.hello {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+}
+
+.userName {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+}
+
+.roleBadge {
+  display: inline-flex;
+  align-items: center;
+  padding: 6rpx 16rpx;
+  border-radius: $radius-round;
+  background-color: rgba(255, 255, 255, 0.9);
+  font-size: $font-size-xs;
+  color: $color-primary;
+  font-weight: $font-weight-medium;
+}
+
+.quickActions {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: $spacing-md;
+  background-color: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  box-shadow: $shadow-card;
+  margin-bottom: $spacing-lg;
+}
+
+.actionItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: $spacing-sm;
+  padding: $spacing-sm 0;
+  transition: all $transition-base;
+
+  &:active {
+    opacity: 0.8;
+    transform: scale(0.96);
+  }
+}
+
+.actionIcon {
+  width: 88rpx;
+  height: 88rpx;
+  border-radius: $radius-lg;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 44rpx;
+}
+
+.iconWater {
+  background-color: #E6F4FF;
+  color: #1677FF;
+}
+
+.iconAccess {
+  background-color: #F6FFED;
+  color: #52C41A;
+}
+
+.iconElevator {
+  background-color: #FFF7E6;
+  color: #FAAD14;
+}
+
+.iconPublic {
+  background-color: #F9F0FF;
+  color: #722ED1;
+}
+
+.actionLabel {
+  font-size: $font-size-xs;
+  color: $color-text-secondary;
+  white-space: nowrap;
+}
+
+.statsRow {
+  display: flex;
+  gap: $spacing-md;
+  margin-bottom: $spacing-lg;
+}
+
+.section {
+  margin-bottom: $spacing-lg;
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: $spacing-md;
+  padding: 0 $spacing-xs;
+}
+
+.sectionTitle {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+}
+
+.moreLink {
+  font-size: $font-size-sm;
+  color: $color-primary;
+}
+
+.roleSwitcher {
+  background-color: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  box-shadow: $shadow-card;
+}
+
+.switcherTitle {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  margin-bottom: $spacing-md;
+}
+
+.roleOptions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-sm;
+}
+
+.roleOption {
+  padding: $spacing-sm $spacing-lg;
+  border-radius: $radius-button;
+  font-size: $font-size-sm;
+  border: 2rpx solid $color-border;
+  color: $color-text-secondary;
+  transition: all $transition-base;
+  background-color: $color-bg-card;
+
+  &:active {
+    opacity: 0.8;
+  }
+}
+
+.roleOptionActive {
+  background-color: $color-primary;
+  color: $color-text-white;
+  border-color: $color-primary;
+}
+
+.banner {
+  background: linear-gradient(135deg, $color-primary 0%, $color-primary-light 100%);
+  border-radius: $radius-lg;
+  padding: $spacing-xl;
+  margin-bottom: $spacing-lg;
+  box-shadow: $shadow-float;
+}
+
+.bannerTitle {
+  font-size: $font-size-xl;
+  font-weight: $font-weight-bold;
+  color: $color-text-white;
+  margin-bottom: $spacing-xs;
+}
+
+.bannerDesc {
+  font-size: $font-size-sm;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.emptyTip {
+  background-color: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-xl * 1.5;
+  text-align: center;
+  box-shadow: $shadow-card;
+}
+
+.emptyTipText {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+}

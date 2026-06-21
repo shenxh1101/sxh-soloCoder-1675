@@ -1,0 +1,217 @@
+@use '@/styles/variables.scss' as *;
+
+.page {
+  min-height: 100vh;
+  background-color: $color-bg-page;
+  padding-bottom: 200rpx;
+}
+
+.form {
+  padding: $spacing-lg $page-padding;
+}
+
+.section {
+  background-color: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  margin-bottom: $spacing-lg;
+  box-shadow: $shadow-card;
+}
+
+.sectionTitle {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  margin-bottom: $spacing-md;
+}
+
+.typeGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: $spacing-md;
+}
+
+.typeCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: $spacing-lg $spacing-md;
+  border-radius: $radius-md;
+  border: 2rpx solid $color-border;
+  background-color: $color-bg-card;
+  transition: all $transition-base;
+  gap: $spacing-sm;
+
+  &:active {
+    opacity: 0.8;
+  }
+}
+
+.typeCardActive {
+  border-color: $color-primary;
+  background-color: $color-primary-bg;
+}
+
+.typeIcon {
+  font-size: 56rpx;
+  margin-bottom: $spacing-xs;
+}
+
+.typeLabel {
+  font-size: $font-size-sm;
+  color: $color-text-primary;
+  font-weight: $font-weight-medium;
+}
+
+.formGroup {
+  margin-bottom: $spacing-lg;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.label {
+  display: block;
+  font-size: $font-size-sm;
+  color: $color-text-primary;
+  font-weight: $font-weight-medium;
+  margin-bottom: $spacing-sm;
+}
+
+.labelRequired::before {
+  content: '*';
+  color: $color-error;
+  margin-right: 4rpx;
+}
+
+.input {
+  width: 100%;
+  height: 80rpx;
+  padding: 0 $spacing-md;
+  background-color: $color-bg-page;
+  border-radius: $radius-md;
+  font-size: $font-size-sm;
+  color: $color-text-primary;
+  box-sizing: border-box;
+}
+
+.textarea {
+  width: 100%;
+  min-height: 200rpx;
+  padding: $spacing-md;
+  background-color: $color-bg-page;
+  border-radius: $radius-md;
+  font-size: $font-size-sm;
+  color: $color-text-primary;
+  box-sizing: border-box;
+  line-height: $line-height-normal;
+}
+
+.imagesGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: $spacing-md;
+}
+
+.imageItem {
+  position: relative;
+  width: 100%;
+  padding-top: 100%;
+  border-radius: $radius-md;
+  overflow: hidden;
+  background-color: $color-bg-hover;
+}
+
+.image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.imageDelete {
+  position: absolute;
+  top: 8rpx;
+  right: 8rpx;
+  width: 40rpx;
+  height: 40rpx;
+  border-radius: $radius-round;
+  background-color: rgba(0, 0, 0, 0.5);
+  color: $color-text-white;
+  font-size: 28rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+.imageAdd {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border: 2rpx dashed $color-border;
+  border-radius: $radius-md;
+  background-color: $color-bg-page;
+  color: $color-text-tertiary;
+  font-size: $font-size-xs;
+  gap: $spacing-xs;
+
+  &:active {
+    opacity: 0.8;
+  }
+}
+
+.addIcon {
+  font-size: 56rpx;
+  line-height: 1;
+}
+
+.footerBar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: $spacing-md $page-padding;
+  padding-bottom: calc($spacing-md + env(safe-area-inset-bottom));
+  background-color: $color-bg-card;
+  box-shadow: 0 -2rpx 12rpx rgba(0, 0, 0, 0.06);
+  display: flex;
+  gap: $spacing-md;
+}
+
+.submitBtn {
+  @include button-reset;
+  flex: 1;
+  height: $button-height-lg;
+  background: linear-gradient(135deg, $color-primary 0%, $color-primary-light 100%);
+  color: $color-text-white;
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  border-radius: $radius-button;
+  transition: all $transition-base;
+
+  &:active {
+    opacity: 0.9;
+    transform: scale(0.98);
+  }
+}
+
+.submitBtnDisabled {
+  background: $color-text-disabled;
+  color: $color-text-white;
+}
+
+.tip {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+  margin-top: $spacing-sm;
+  line-height: $line-height-normal;
+}

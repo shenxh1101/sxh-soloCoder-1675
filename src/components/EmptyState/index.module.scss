@@ -1,0 +1,26 @@
+@use '@/styles/variables.scss' as *;
+
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: $spacing-xl * 2;
+}
+
+.icon {
+  font-size: 120rpx;
+  color: $color-text-disabled;
+  margin-bottom: $spacing-lg;
+}
+
+.title {
+  font-size: $font-size-lg;
+  color: $color-text-secondary;
+  margin-bottom: $spacing-sm;
+}
+
+.description {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+}

@@ -1,0 +1,161 @@
+@use '@/styles/variables.scss' as *;
+
+.page {
+  min-height: 100vh;
+  background-color: $color-bg-page;
+  padding-bottom: $spacing-xl;
+}
+
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: $spacing-md;
+  padding: $spacing-lg $page-padding;
+}
+
+.section {
+  background-color: $color-bg-card;
+  margin: 0 $page-padding $spacing-lg;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  box-shadow: $shadow-card;
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: $spacing-lg;
+}
+
+.sectionTitle {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+}
+
+.exportBtn {
+  padding: $spacing-xs $spacing-md;
+  background-color: $color-primary-bg;
+  color: $color-primary;
+  font-size: $font-size-xs;
+  border-radius: $radius-button;
+  font-weight: $font-weight-medium;
+
+  &:active {
+    opacity: 0.8;
+  }
+}
+
+.typeRow {
+  display: flex;
+  align-items: center;
+  padding: $spacing-md 0;
+  border-bottom: 1rpx solid $color-divider;
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.typeName {
+  width: 160rpx;
+  font-size: $font-size-sm;
+  color: $color-text-primary;
+  flex-shrink: 0;
+}
+
+.barWrap {
+  flex: 1;
+  height: 16rpx;
+  background-color: $color-bg-hover;
+  border-radius: $radius-round;
+  overflow: hidden;
+  margin: 0 $spacing-md;
+}
+
+.barFill {
+  height: 100%;
+  border-radius: $radius-round;
+  background: linear-gradient(90deg, $color-primary 0%, $color-primary-light 100%);
+  transition: width $transition-base;
+}
+
+.typeCount {
+  width: 80rpx;
+  text-align: right;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+}
+
+.typeMeta {
+  display: flex;
+  justify-content: space-between;
+  padding: $spacing-xs 0 0;
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+}
+
+.workerRow {
+  display: flex;
+  align-items: center;
+  padding: $spacing-md 0;
+  border-bottom: 1rpx solid $color-divider;
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.rank {
+  width: 48rpx;
+  height: 48rpx;
+  border-radius: $radius-round;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-bold;
+  color: $color-text-white;
+  background-color: $color-text-disabled;
+  margin-right: $spacing-md;
+  flex-shrink: 0;
+}
+
+.rankTop1 { background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%); }
+.rankTop2 { background: linear-gradient(135deg, #C0C0C0 0%, #A0A0A0 100%); }
+.rankTop3 { background: linear-gradient(135deg, #CD7F32 0%, #B8860B 100%); }
+
+.workerInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.workerName {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  color: $color-text-primary;
+  margin-bottom: 4rpx;
+}
+
+.workerMeta {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+}
+
+.workerStats {
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.workerCount {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-bold;
+  color: $color-primary;
+}
+
+.workerLabel {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+}
