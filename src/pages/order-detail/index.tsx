@@ -2,9 +2,10 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { View, Text, Image, ScrollView, Textarea, Input } from '@tarojs/components';
 import Taro, { useRouter, useDidShow } from '@tarojs/taro';
 import classnames from 'classnames';
+import dayjs from 'dayjs';
 import { useUserStore } from '@/store/useUserStore';
 import { useOrderStore } from '@/store/useOrderStore';
-import { getRepairTypeLabel } from '@/utils/constants';
+import { getRepairTypeLabel, getOrderStatusLabel } from '@/utils/constants';
 import { formatDateTime, formatDuration, formatPhone } from '@/utils/format';
 import StatusTag from '@/components/StatusTag';
 import Timeline from '@/components/Timeline';
@@ -103,6 +104,82 @@ const OrderDetailPage: React.FC = () => {
 
   const handleRate = () => {
     Taro.navigateTo({ url: `/pages/rating/index?id=${order.id}` });
+  };
+
+  const exportServiceRecord = () => {
+    const fs = Taro.getFileSystemManager();
+    const fileName = `工单服务记录_${order.orderNo}_${dayjs().format('YYYYMMDD_HHmmss')}.csv`;
+    const filePath = `${Taro.env.USER_DATA_PATH}/${fileName}`;
+
+    const lines: string[] = [];
+    lines.push('工单服务记录明细');
+    lines.push('');
+    lines.push('基本信息');
+    lines.push(`工单号,${order.orderNo}`);
+    lines.push(`工单状态,${getOrderStatusLabel(order.status)}`);
+    lines.push(`报修类型,${getRepairTypeLabel(order.type)}`);
+    lines.push(`报修标题,${order.title}`);
+    lines.push(`问题描述,"${(order.description || '').replace(/"/g, '""')}"`);
+    lines.push(`提交时间,${order.createTime || ''}`);
+    lines.push('');
+    lines.push('业主信息');
+    lines.push(`姓名,${order.ownerInfo?.name || ''}`);
+    lines.push(`联系电话,${order.ownerInfo?.phone || ''}`);
+    lines.push(`房屋信息,${order.ownerInfo?.building || ''}${order.ownerInfo?.room || ''}`);
+    lines.push('');
+    lines.push('维修信息');
+    lines.push(`维修师傅,${order.workerName || '未分配'}`);
+    lines.push(`师傅电话,${order.workerPhone || ''}`);
+    lines.push(`派单时间,${order.assignTime || ''}`);
+    lines.push(`开始处理时间,${order.startTime || ''}`);
+    lines.push(`完成时间,${order.completeTime || ''}`);
+    lines.push(`响应时长,${order.responseMinutes ? formatDuration(order.responseMinutes) : ''}`);
+    lines.push(`处理时长,${order.processMinutes ? formatDuration(order.processMinutes) : ''}`);
+    lines.push(`维修说明,"${(order.resultDescription || '').replace(/"/g, '""')}"`);
+    lines.push(`维修照片数量,${order.resultImages?.length || 0}`);
+    lines.push('');
+    lines.push('满意度评价');
+    lines.push(`评分,${order.rating ? order.rating + '星' : '未评价'}`);
+    lines.push(`评价内容,"${(order.ratingComment || '').replace(/"/g, '""')}"`);
+    lines.push('');
+    lines.push('处理时间线');
+    order.timeline.forEach((item, idx) => {
+      lines.push(`${idx + 1},${item.time},${item.description},${item.operatorName || ''}`);
+    });
+
+    const csvContent = '\uFEFF' + lines.join('\n');
+
+    Taro.showLoading({ title: '生成中...' });
+    fs.writeFile({
+      filePath,
+      data: csvContent,
+      encoding: 'utf8',
+      success: () => {
+        Taro.hideLoading();
+        Taro.showModal({
+          title: '导出成功',
+          content: `服务记录文件已生成：${fileName}\n是否打开查看？`,
+          confirmText: '打开',
+          success: (res) => {
+            if (res.confirm) {
+              Taro.openDocument({
+                filePath,
+                showMenu: true,
+                fail: (err) => {
+                  console.error('打开文档失败:', err);
+                  Taro.showToast({ title: '打开失败', icon: 'none' });
+                },
+              });
+            }
+          },
+        });
+      },
+      fail: (err) => {
+        console.error('写入文件失败:', err);
+        Taro.hideLoading();
+        Taro.showToast({ title: '导出失败', icon: 'none' });
+      },
+    });
   };
 
   const renderFooterButtons = () => {
@@ -212,30 +289,72 @@ const OrderDetailPage: React.FC = () => {
       </View>
 
       {order.status === 'completed' && (
-        <View className={styles.section}>
-          <Text className={styles.sectionTitle}>维修结果</Text>
-          <Text className={styles.description}>{order.resultDescription || '无'}</Text>
-          {order.resultImages.length > 0 && (
-            <View className={styles.imageList}>
-              {order.resultImages.map((img, idx) => (
-                <View className={styles.imageItem} key={idx}>
-                  <Image className={styles.image} src={img} mode="aspectFill" />
-                </View>
-              ))}
+        <View className={styles.serviceRecord}>
+          <View className={styles.serviceRecordHeader}>
+            <Text className={styles.sectionTitle}>服务记录</Text>
+            {(userInfo.role === 'customer_service' || userInfo.role === 'manager') && (
+              <View className={styles.exportBtn} onClick={exportServiceRecord}>
+                <Text className={styles.exportBtnText}>导出记录</Text>
+              </View>
+            )}
+          </View>
+          
+          <View className={styles.serviceCard}>
+            <View className={styles.serviceRow}>
+              <Text className={styles.serviceLabel}>维修师傅</Text>
+              <Text className={styles.serviceValue}>{order.workerName || '-'}</Text>
             </View>
-          )}
-          {order.rating && (
-            <View className={styles.ratingBox} style={{ marginTop: 24 }}>
-              <View className={styles.ratingStars}>
-                {Array.from({ length: 5 }).map((_, idx) => (
-                  <Text key={idx} className={styles.star}>
-                    {idx < (order.rating || 0) ? '⭐' : '☆'}
-                  </Text>
+            {order.responseMinutes && (
+              <View className={styles.serviceRow}>
+                <Text className={styles.serviceLabel}>响应时间</Text>
+                <Text className={styles.serviceValue}>{formatDuration(order.responseMinutes)}</Text>
+              </View>
+            )}
+            {order.processMinutes && (
+              <View className={styles.serviceRow}>
+                <Text className={styles.serviceLabel}>维修耗时</Text>
+                <Text className={styles.serviceValue}>{formatDuration(order.processMinutes)}</Text>
+              </View>
+            )}
+            <View className={styles.serviceRow}>
+              <Text className={styles.serviceLabel}>完成时间</Text>
+              <Text className={styles.serviceValue}>{order.completeTime || '-'}</Text>
+            </View>
+          </View>
+
+          <View className={styles.serviceSubSection}>
+            <Text className={styles.serviceSubTitle}>维修说明</Text>
+            <Text className={styles.description}>{order.resultDescription || '无'}</Text>
+          </View>
+
+          {order.resultImages.length > 0 && (
+            <View className={styles.serviceSubSection}>
+              <Text className={styles.serviceSubTitle}>维修照片</Text>
+              <View className={styles.imageList}>
+                {order.resultImages.map((img, idx) => (
+                  <View className={styles.imageItem} key={idx}>
+                    <Image className={styles.image} src={img} mode="aspectFill" />
+                  </View>
                 ))}
               </View>
-              {order.ratingComment && (
-                <Text className={styles.ratingComment}>{order.ratingComment}</Text>
-              )}
+            </View>
+          )}
+
+          {order.rating && (
+            <View className={styles.serviceSubSection}>
+              <Text className={styles.serviceSubTitle}>业主评价</Text>
+              <View className={styles.ratingBox}>
+                <View className={styles.ratingStars}>
+                  {Array.from({ length: 5 }).map((_, idx) => (
+                    <Text key={idx} className={styles.star}>
+                      {idx < (order.rating || 0) ? '⭐' : '☆'}
+                    </Text>
+                  ))}
+                </View>
+                {order.ratingComment && (
+                  <Text className={styles.ratingComment}>{order.ratingComment}</Text>
+                )}
+              </View>
             </View>
           )}
         </View>

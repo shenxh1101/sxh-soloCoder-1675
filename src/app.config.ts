@@ -9,7 +9,8 @@ export default defineAppConfig({
     'pages/worker-select/index',
     'pages/rating/index',
     'pages/timeout/index',
-    'pages/batch-assign/index'
+    'pages/batch-assign/index',
+    'pages/dispatch/index'
   ],
   window: {
     backgroundTextStyle: 'light',

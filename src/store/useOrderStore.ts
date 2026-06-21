@@ -4,11 +4,43 @@ import Taro from '@tarojs/taro';
 import type { RepairOrder, OrderStatus, RepairType, StatisticsData, TypeStatistic, WorkerStatistic, WorkerInfo } from '@/types';
 import { ordersData } from '@/data/orders';
 import { workersData } from '@/data/workers';
-import { REPAIR_TYPE_OPTIONS } from '@/utils/constants';
+import { REPAIR_TYPE_OPTIONS, getRepairTypeLabel } from '@/utils/constants';
 import { generateOrderNo } from '@/utils/format';
 
 const STORAGE_KEY = 'repair_orders_v1';
 const STORAGE_INIT_FLAG = 'repair_orders_initialized_v1';
+
+const parseSearchKeywords = (input: string): string[] => {
+  const keywords: string[] = [];
+  const lowerInput = input.trim().toLowerCase();
+
+  const spaceTokens = lowerInput.split(/\s+/).filter(Boolean);
+  spaceTokens.forEach((token) => {
+    const buildingMatch = token.match(/^(\d+)[栋号楼\-—_](\d+)$/);
+    if (buildingMatch) {
+      keywords.push(`${buildingMatch[1]}栋`);
+      keywords.push(buildingMatch[2]);
+      return;
+    }
+
+    const workerMatch = token.match(/^(.+师傅)(.+)$/);
+    if (workerMatch) {
+      keywords.push(workerMatch[1]);
+      keywords.push(workerMatch[2]);
+      return;
+    }
+
+    const buildingOnly = token.match(/^(\d+)[栋号楼]$/);
+    if (buildingOnly) {
+      keywords.push(`${buildingOnly[1]}栋`);
+      return;
+    }
+
+    keywords.push(token);
+  });
+
+  return [...new Set(keywords)];
+};
 
 const loadOrdersFromStorage = (): RepairOrder[] => {
   try {
@@ -372,7 +404,7 @@ export const useOrderStore = create<OrderState>((set, get) => ({
       orders = orders.filter((o) => o.workerName?.includes(filters.workerName!));
     }
     if (filters.keyword) {
-      const keywords = filters.keyword.trim().toLowerCase().split(/\s+/).filter(Boolean);
+      const keywords = parseSearchKeywords(filters.keyword);
       if (keywords.length > 0) {
         orders = orders.filter((o) => {
           const searchText = [
@@ -385,6 +417,7 @@ export const useOrderStore = create<OrderState>((set, get) => ({
             o.ownerInfo.phone,
             o.workerName || '',
             o.resultDescription || '',
+            getRepairTypeLabel(o.type),
           ].join(' ').toLowerCase();
           return keywords.every((kw) => searchText.includes(kw));
         });

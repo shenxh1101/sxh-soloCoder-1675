@@ -95,6 +95,10 @@ const HomePage: React.FC = () => {
     Taro.navigateTo({ url: '/pages/timeout/index' });
   };
 
+  const goToDispatch = () => {
+    Taro.navigateTo({ url: '/pages/dispatch/index' });
+  };
+
   const goToStatistics = () => {
     Taro.navigateTo({ url: '/pages/statistics/index' });
   };
@@ -110,6 +114,14 @@ const HomePage: React.FC = () => {
         }
       },
     });
+  };
+
+  const handleTaskAction = (order: any) => {
+    if (order.status === 'assigned') {
+      handleStartOrder(order.id);
+    } else {
+      goToOrderDetail(order.id);
+    }
   };
 
   const goToOrderDetail = (orderId: string) => {
@@ -228,7 +240,7 @@ const HomePage: React.FC = () => {
                     </View>
                     <View
                       className={classnames(styles.taskBtn, styles.taskBtnPrimary)}
-                      onClick={(e) => { e.stopPropagation(); handleStartOrder(order.id); }}
+                      onClick={(e) => { e.stopPropagation(); handleTaskAction(order); }}
                     >
                       <Text>继续</Text>
                     </View>
@@ -260,7 +272,7 @@ const HomePage: React.FC = () => {
                     </View>
                     <View
                       className={classnames(styles.taskBtn, styles.taskBtnPrimary)}
-                      onClick={(e) => { e.stopPropagation(); handleStartOrder(order.id); }}
+                      onClick={(e) => { e.stopPropagation(); handleTaskAction(order); }}
                     >
                       <Text>继续</Text>
                     </View>
@@ -302,7 +314,7 @@ const HomePage: React.FC = () => {
                       </View>
                       <View
                         className={classnames(styles.taskBtn, styles.taskBtnPrimary)}
-                        onClick={(e) => { e.stopPropagation(); handleStartOrder(order.id); }}
+                        onClick={(e) => { e.stopPropagation(); handleTaskAction(order); }}
                       >
                         <Text>继续</Text>
                       </View>
@@ -329,7 +341,7 @@ const HomePage: React.FC = () => {
                     </View>
                     <View
                       className={classnames(styles.taskBtn, styles.taskBtnPrimary)}
-                      onClick={(e) => { e.stopPropagation(); handleStartOrder(order.id); }}
+                      onClick={(e) => { e.stopPropagation(); handleTaskAction(order); }}
                     >
                       <Text>开始</Text>
                     </View>
@@ -382,6 +394,20 @@ const HomePage: React.FC = () => {
             </View>
             <View className={styles.timeoutTip}>
               <Text className={styles.timeoutTipText}>⏰ 查看超时未派单和处理超时的工单，及时处理避免投诉</Text>
+            </View>
+          </View>
+        )}
+
+        {(userInfo.role === 'manager' || userInfo.role === 'customer_service') && (
+          <View className={styles.section} onClick={goToDispatch}>
+            <View className={styles.sectionHeader}>
+              <Text className={styles.sectionTitle}>派单调度中心</Text>
+              <Text className={styles.moreLink}>
+                查看详情 ›
+              </Text>
+            </View>
+            <View className={styles.dispatchTip}>
+              <Text className={styles.dispatchTipText}>🎯 待派单、超时工单、师傅负载一览无余，支持批量分配</Text>
             </View>
           </View>
         )}

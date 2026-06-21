@@ -1,0 +1,419 @@
+@use '@/styles/variables.scss' as *;
+
+.page {
+  min-height: 100vh;
+  background-color: $color-bg-page;
+  padding-bottom: 120rpx;
+}
+
+.header {
+  padding: $spacing-xl $page-padding $spacing-lg;
+  background: linear-gradient(135deg, $color-primary 0%, $color-primary-light 100%);
+}
+
+.title {
+  display: block;
+  font-size: $font-size-xl;
+  font-weight: $font-weight-bold;
+  color: $color-text-white;
+  margin-bottom: $spacing-xs;
+}
+
+.subtitle {
+  font-size: $font-size-sm;
+  color: rgba($color-text-white, 0.85);
+}
+
+.filterBar {
+  padding: $spacing-md $page-padding;
+  background-color: $color-bg-card;
+  border-bottom: 1rpx solid $color-divider;
+}
+
+.filterScroll {
+  white-space: nowrap;
+}
+
+.filterChip {
+  display: inline-flex;
+  align-items: center;
+  padding: $spacing-sm $spacing-lg;
+  background-color: $color-primary-bg;
+  border-radius: $radius-round;
+  margin-right: $spacing-sm;
+  transition: all $transition-base;
+
+  &:active {
+    opacity: 0.8;
+  }
+
+  Text {
+    font-size: $font-size-xs;
+    color: $color-primary;
+  }
+}
+
+.filterChipActive {
+  background-color: $color-primary;
+
+  Text {
+    color: $color-text-white;
+    font-weight: $font-weight-medium;
+  }
+}
+
+.chipOutline {
+  background-color: transparent;
+  border: 2rpx solid $color-divider;
+
+  Text {
+    color: $color-text-secondary;
+  }
+}
+
+.chipOutlineActive {
+  border-color: $color-primary;
+  background-color: $color-primary-bg;
+
+  Text {
+    color: $color-primary;
+  }
+}
+
+.section {
+  margin: $spacing-lg $page-padding;
+  background-color: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  box-shadow: $shadow-card;
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: $spacing-md;
+}
+
+.sectionTitle {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+}
+
+.sectionHint {
+  font-size: $font-size-xs;
+  color: $color-primary;
+  font-weight: $font-weight-medium;
+}
+
+.selectAll {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+
+  &:active {
+    opacity: 0.8;
+  }
+}
+
+.selectAllText {
+  font-size: $font-size-xs;
+  color: $color-text-secondary;
+}
+
+.checkbox {
+  flex-shrink: 0;
+  width: 40rpx;
+  height: 40rpx;
+  border: 2rpx solid $color-text-tertiary;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: $color-bg-card;
+  transition: all $transition-base;
+}
+
+.checkboxChecked {
+  background-color: $color-primary;
+  border-color: $color-primary;
+}
+
+.checkIcon {
+  color: $color-text-white;
+  font-size: 24rpx;
+  font-weight: $font-weight-bold;
+}
+
+.orderList {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-sm;
+  max-height: 600rpx;
+  overflow-y: auto;
+}
+
+.orderCard {
+  display: flex;
+  align-items: flex-start;
+  gap: $spacing-md;
+  padding: $spacing-md;
+  background-color: $color-bg-hover;
+  border-radius: $radius-md;
+  border-left: 6rpx solid $color-text-tertiary;
+  transition: all $transition-base;
+
+  &:active {
+    opacity: 0.8;
+  }
+}
+
+.orderCardTimeout {
+  border-left-color: $color-error;
+  background-color: rgba($color-error, 0.05);
+}
+
+.orderCardSelected {
+  border-left-color: $color-primary;
+  background-color: rgba($color-primary, 0.08);
+}
+
+.orderTop {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  margin-bottom: 4rpx;
+}
+
+.orderNo {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+}
+
+.timeoutBadge {
+  padding: 2rpx 10rpx;
+  background-color: rgba($color-error, 0.1);
+  border-radius: $radius-xs;
+
+  Text {
+    font-size: 20rpx;
+    color: $color-error;
+    font-weight: $font-weight-medium;
+  }
+}
+
+.orderTitle {
+  display: block;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  color: $color-text-primary;
+  margin-bottom: 6rpx;
+}
+
+.orderMeta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: $spacing-sm;
+}
+
+.typeTag {
+  font-size: 20rpx;
+  color: $color-primary;
+  background-color: rgba($color-primary, 0.1);
+  padding: 2rpx 10rpx;
+  border-radius: $radius-xs;
+}
+
+.location {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+}
+
+.empty {
+  padding: $spacing-xl * 2;
+  text-align: center;
+
+  Text {
+    font-size: $font-size-sm;
+    color: $color-text-tertiary;
+  }
+}
+
+.workerList {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-sm;
+}
+
+.workerCard {
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+  padding: $spacing-md;
+  background-color: $color-bg-hover;
+  border-radius: $radius-md;
+  border: 2rpx solid transparent;
+  transition: all $transition-base;
+  position: relative;
+
+  &:active {
+    opacity: 0.8;
+  }
+}
+
+.workerCardSelected {
+  border-color: $color-primary;
+  background-color: rgba($color-primary, 0.05);
+}
+
+.workerCardHighLoad {
+  border-left: 6rpx solid $color-error;
+}
+
+.workerInfo {
+  flex-shrink: 0;
+  width: 180rpx;
+}
+
+.workerName {
+  display: block;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  margin-bottom: 6rpx;
+}
+
+.workerSkills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4rpx;
+}
+
+.skillTag {
+  font-size: 20rpx;
+  color: $color-text-tertiary;
+  background-color: rgba($color-text-tertiary, 0.1);
+  padding: 2rpx 8rpx;
+  border-radius: $radius-xs;
+}
+
+.workerStats {
+  flex: 1;
+  min-width: 0;
+}
+
+.loadBarWrap {
+  height: 12rpx;
+  background-color: rgba($color-text-tertiary, 0.1);
+  border-radius: 6rpx;
+  overflow: hidden;
+  margin-bottom: 6rpx;
+}
+
+.loadBarFill {
+  height: 100%;
+  background-color: $color-success;
+  border-radius: 6rpx;
+  transition: width $transition-base;
+}
+
+.loadBarHigh {
+  background-color: $color-error;
+}
+
+.loadNumbers {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.loadText {
+  font-size: 20rpx;
+  color: $color-text-tertiary;
+}
+
+.loadAdd {
+  font-size: 20rpx;
+  color: $color-primary;
+  font-weight: $font-weight-semibold;
+}
+
+.selectedMark {
+  position: absolute;
+  top: $spacing-md;
+  right: $spacing-md;
+  width: 36rpx;
+  height: 36rpx;
+  background-color: $color-primary;
+  color: $color-text-white;
+  font-size: 24rpx;
+  font-weight: $font-weight-bold;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.footerBar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+  padding: $spacing-md $page-padding;
+  padding-bottom: calc($spacing-md + env(safe-area-inset-bottom));
+  background-color: $color-bg-card;
+  border-top: 1rpx solid $color-divider;
+  box-shadow: 0 -4rpx 16rpx rgba(0, 0, 0, 0.06);
+}
+
+.footerInfo {
+  flex: 1;
+}
+
+.footerCount {
+  display: block;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  margin-bottom: 4rpx;
+}
+
+.footerWorker {
+  font-size: $font-size-xs;
+  color: $color-primary;
+}
+
+.submitBtn {
+  flex-shrink: 0;
+  min-width: 200rpx;
+  height: 80rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: $color-primary;
+  border-radius: $radius-button;
+  transition: all $transition-base;
+
+  &:active {
+    opacity: 0.8;
+  }
+
+  Text {
+    font-size: $font-size-md;
+    color: $color-text-white;
+    font-weight: $font-weight-semibold;
+  }
+}
+
+.submitBtnDisabled {
+  background-color: $color-disabled-bg;
+
+  Text {
+    color: $color-disabled-text;
+  }
+}

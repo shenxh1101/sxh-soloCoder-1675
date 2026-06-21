@@ -245,6 +245,23 @@
   line-height: 1.6;
 }
 
+.dispatchTip {
+  background-color: rgba($color-primary, 0.08);
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  border: 2rpx dashed rgba($color-primary, 0.3);
+
+  &:active {
+    opacity: 0.8;
+  }
+}
+
+.dispatchTipText {
+  font-size: $font-size-sm;
+  color: $color-primary;
+  line-height: 1.6;
+}
+
 .todayBadge {
   font-size: $font-size-xs;
   color: $color-success;

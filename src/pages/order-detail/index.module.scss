@@ -187,6 +187,82 @@
   line-height: $line-height-normal;
 }
 
+.serviceRecord {
+  margin: $spacing-md $page-padding;
+  background-color: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  box-shadow: $shadow-card;
+}
+
+.serviceRecordHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: $spacing-md;
+}
+
+.exportBtn {
+  padding: $spacing-sm $spacing-md;
+  background-color: rgba($color-primary, 0.1);
+  border-radius: $radius-sm;
+
+  &:active {
+    opacity: 0.7;
+  }
+}
+
+.exportBtnText {
+  font-size: $font-size-sm;
+  color: $color-primary;
+  font-weight: $font-weight-medium;
+}
+
+.serviceCard {
+  background-color: $color-bg-page;
+  border-radius: $radius-md;
+  padding: $spacing-md;
+  margin-bottom: $spacing-md;
+}
+
+.serviceRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: $spacing-sm 0;
+
+  & + .serviceRow {
+    border-top: 2rpx solid $color-border-light;
+  }
+}
+
+.serviceLabel {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+}
+
+.serviceValue {
+  font-size: $font-size-sm;
+  color: $color-text-primary;
+  font-weight: $font-weight-medium;
+}
+
+.serviceSubSection {
+  margin-top: $spacing-md;
+
+  & + .serviceSubSection {
+    margin-top: $spacing-lg;
+  }
+}
+
+.serviceSubTitle {
+  font-size: $font-size-md;
+  color: $color-text-primary;
+  font-weight: $font-weight-semibold;
+  margin-bottom: $spacing-sm;
+  display: block;
+}
+
 .footerBar {
   position: fixed;
   bottom: 0;
