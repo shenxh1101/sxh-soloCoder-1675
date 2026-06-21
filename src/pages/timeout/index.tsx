@@ -43,16 +43,20 @@ const TimeoutPage: React.FC = () => {
     Taro.navigateTo({ url: `/pages/order-detail/index?id=${orderId}` });
   };
 
-  const handleReassign = (order: typeof displayOrders[0]) => {
-    Taro.showModal({
-      title: '重新派单',
-      content: `确定要重新派单「${order.title}」吗？`,
-      success: (res) => {
-        if (res.confirm) {
-          Taro.navigateTo({ url: `/pages/worker-select/index?orderId=${order.id}` });
-        }
-      },
-    });
+  const goAssign = (order: typeof displayOrders[0]) => {
+    if (activeTab === 'pending') {
+      Taro.navigateTo({ url: `/pages/worker-select/index?orderId=${order.id}` });
+    } else {
+      Taro.showModal({
+        title: '重新派单',
+        content: `确定要重新派单「${order.title}」吗？\n当前师傅：${order.workerName || '未分配'}`,
+        success: (res) => {
+          if (res.confirm) {
+            Taro.navigateTo({ url: `/pages/worker-select/index?orderId=${order.id}&reassign=1` });
+          }
+        },
+      });
+    }
   };
 
   return (
@@ -180,9 +184,9 @@ const TimeoutPage: React.FC = () => {
                 </View>
                 <View
                   className={classnames(styles.actionBtn, styles.btnPrimary)}
-                  onClick={() => activeTab === 'processing' ? handleReassign(order) : goToDetail(order.id)}
+                  onClick={() => goAssign(order)}
                 >
-                  <Text>{activeTab === 'processing' ? '重新派单' : '立即派单'}</Text>
+                  <Text>{activeTab === 'pending' ? '立即派单' : '重新派单'}</Text>
                 </View>
               </View>
             </View>

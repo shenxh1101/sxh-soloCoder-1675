@@ -56,6 +56,9 @@ interface OrderState {
     workerName?: string;
     keyword?: string;
   }) => RepairOrder[];
+  getWorkersWithOrders: () => string[];
+  getBuildingsWithOrders: () => string[];
+  batchAssignOrders: (orderIds: string[], workerId: string) => number;
   createOrder: (data: {
     title: string;
     description: string;
@@ -369,16 +372,77 @@ export const useOrderStore = create<OrderState>((set, get) => ({
       orders = orders.filter((o) => o.workerName?.includes(filters.workerName!));
     }
     if (filters.keyword) {
-      const kw = filters.keyword.toLowerCase();
-      orders = orders.filter((o) =>
-        o.title.toLowerCase().includes(kw) ||
-        o.description.toLowerCase().includes(kw) ||
-        o.orderNo.toLowerCase().includes(kw) ||
-        o.ownerInfo.name.toLowerCase().includes(kw) ||
-        o.ownerInfo.room.toLowerCase().includes(kw),
-      );
+      const keywords = filters.keyword.trim().toLowerCase().split(/\s+/).filter(Boolean);
+      if (keywords.length > 0) {
+        orders = orders.filter((o) => {
+          const searchText = [
+            o.title,
+            o.description,
+            o.orderNo,
+            o.ownerInfo.name,
+            o.ownerInfo.building,
+            o.ownerInfo.room,
+            o.ownerInfo.phone,
+            o.workerName || '',
+            o.resultDescription || '',
+          ].join(' ').toLowerCase();
+          return keywords.every((kw) => searchText.includes(kw));
+        });
+      }
     }
     return orders.sort((a, b) => new Date(b.createTime).getTime() - new Date(a.createTime).getTime());
+  },
+
+  getWorkersWithOrders: () => {
+    const { orders } = get();
+    const workerNames = new Set<string>();
+    orders.forEach((o) => {
+      if (o.workerName) workerNames.add(o.workerName);
+    });
+    workersData.forEach((w) => workerNames.add(w.name));
+    return Array.from(workerNames).sort();
+  },
+
+  getBuildingsWithOrders: () => {
+    const { orders } = get();
+    const buildings = new Set<string>();
+    orders.forEach((o) => {
+      if (o.ownerInfo.building) buildings.add(o.ownerInfo.building);
+    });
+    return Array.from(buildings).sort();
+  },
+
+  batchAssignOrders: (orderIds: string[], workerId: string) => {
+    const worker = workersData.find((w) => w.id === workerId);
+    if (!worker) return 0;
+    const now = dayjs().format('YYYY-MM-DD HH:mm:ss');
+    let count = 0;
+    const newOrders = get().orders.map((o) => {
+      if (!orderIds.includes(o.id) || o.status !== 'pending') return o;
+      count++;
+      return {
+        ...o,
+        status: 'assigned' as OrderStatus,
+        workerId: worker.id,
+        workerName: worker.name,
+        workerPhone: worker.phone,
+        assignTime: now,
+        responseMinutes: dayjs(now).diff(dayjs(o.createTime), 'minute'),
+        timeline: [
+          ...o.timeline,
+          {
+            status: 'assigned' as OrderStatus,
+            time: now,
+            description: `客服批量派单给${worker.name}`,
+            operatorName: '客服',
+          },
+        ],
+      };
+    });
+    set({ orders: newOrders });
+    saveOrdersToStorage(newOrders);
+    console.log('[OrderStore] 批量派单成功:', count, '单 ->', worker.name);
+    return count;
   },
 
   resetOrders: () => {

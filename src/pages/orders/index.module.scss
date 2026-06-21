@@ -161,3 +161,168 @@
 .orderList {
   padding: $spacing-lg $page-padding $spacing-xl * 2;
 }
+
+.batchHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $spacing-md $page-padding;
+  background-color: $color-primary;
+  color: $color-text-white;
+}
+
+.batchTitle {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+
+  Text {
+    color: $color-text-white;
+    font-weight: $font-weight-semibold;
+    font-size: $font-size-md;
+  }
+}
+
+.batchCount {
+  background-color: rgba($color-text-white, 0.2);
+  padding: 4rpx $spacing-sm;
+  border-radius: $radius-xs;
+  font-size: $font-size-xs !important;
+  font-weight: $font-weight-medium !important;
+}
+
+.batchActions {
+  display: flex;
+  gap: $spacing-sm;
+}
+
+.batchBtnSecondary {
+  padding: $spacing-sm $spacing-lg;
+  background-color: rgba($color-text-white, 0.15);
+  border-radius: $radius-button;
+
+  Text {
+    color: $color-text-white;
+    font-size: $font-size-sm;
+  }
+
+  &:active {
+    opacity: 0.8;
+  }
+}
+
+.batchBtnPrimary {
+  padding: $spacing-sm $spacing-lg;
+  background-color: $color-text-white;
+  border-radius: $radius-button;
+
+  Text {
+    color: $color-primary;
+    font-size: $font-size-sm;
+    font-weight: $font-weight-semibold;
+  }
+
+  &:active {
+    opacity: 0.8;
+  }
+}
+
+.batchBtnDisabled {
+  opacity: 0.5;
+}
+
+.batchOrderItem {
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+  margin-bottom: $spacing-md;
+
+  &:active {
+    opacity: 0.8;
+  }
+}
+
+.checkbox {
+  flex-shrink: 0;
+  width: 44rpx;
+  height: 44rpx;
+  border: 3rpx solid $color-text-tertiary;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: $color-bg-card;
+  transition: all $transition-base;
+}
+
+.checkboxChecked {
+  background-color: $color-primary;
+  border-color: $color-primary;
+}
+
+.checkIcon {
+  color: $color-text-white;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-bold;
+}
+
+.selectAllRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $spacing-sm $page-padding;
+  background-color: $color-primary-bg;
+}
+
+.selectAllLeft {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+
+  &:active {
+    opacity: 0.8;
+  }
+}
+
+.selectAllText {
+  font-size: $font-size-sm;
+  color: $color-text-primary;
+  font-weight: $font-weight-medium;
+}
+
+.selectAllHint {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+}
+
+.batchEntry {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  margin: $spacing-md $page-padding;
+  padding: $spacing-md $spacing-lg;
+  background: linear-gradient(135deg, $color-primary 0%, $color-primary-light 100%);
+  border-radius: $radius-lg;
+  box-shadow: $shadow-card;
+
+  &:active {
+    opacity: 0.9;
+  }
+}
+
+.batchEntryIcon {
+  font-size: $font-size-xl;
+}
+
+.batchEntryText {
+  flex: 1;
+  font-size: $font-size-sm;
+  color: $color-text-white;
+  font-weight: $font-weight-medium;
+}
+
+.batchEntryArrow {
+  font-size: $font-size-lg;
+  color: $color-text-white;
+  opacity: 0.8;
+}

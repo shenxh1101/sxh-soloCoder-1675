@@ -8,7 +8,8 @@ export default defineAppConfig({
     'pages/statistics/index',
     'pages/worker-select/index',
     'pages/rating/index',
-    'pages/timeout/index'
+    'pages/timeout/index',
+    'pages/batch-assign/index'
   ],
   window: {
     backgroundTextStyle: 'light',

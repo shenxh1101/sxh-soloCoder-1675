@@ -1,8 +1,8 @@
 import React, { useState, useMemo } from 'react';
 import { View, Text, ScrollView, Input } from '@tarojs/components';
-import Taro from '@tarojs/taro';
+import Taro, { useDidShow } from '@tarojs/taro';
 import classnames from 'classnames';
-import type { OrderStatus, RepairType } from '@/types';
+import type { OrderStatus, RepairType, RepairOrder } from '@/types';
 import { useUserStore } from '@/store/useUserStore';
 import { useOrderStore } from '@/store/useOrderStore';
 import { ORDER_STATUS_OPTIONS, REPAIR_TYPE_OPTIONS } from '@/utils/constants';
@@ -17,15 +17,24 @@ interface FilterTab {
 
 const OrdersPage: React.FC = () => {
   const { userInfo } = useUserStore();
-  const { orders, searchOrders, getOrdersByOwner, getOrdersByWorker } = useOrderStore();
+  const { orders, searchOrders, getOrdersByOwner, getOrdersByWorker, getWorkersWithOrders, getBuildingsWithOrders } = useOrderStore();
   const [activeFilter, setActiveFilter] = useState<OrderStatus | 'all'>('all');
   const [showFilters, setShowFilters] = useState(false);
   const [searchKeyword, setSearchKeyword] = useState('');
   const [filterType, setFilterType] = useState<RepairType | ''>('');
   const [filterBuilding, setFilterBuilding] = useState('');
   const [filterWorker, setFilterWorker] = useState('');
+  const [batchMode, setBatchMode] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+
+  useDidShow(() => {
+    console.log('[Orders] 页面显示');
+  });
 
   const isStaff = userInfo.role === 'customer_service' || userInfo.role === 'manager';
+
+  const workerNames = useMemo(() => getWorkersWithOrders(), [orders]);
+  const buildingNames = useMemo(() => getBuildingsWithOrders(), [orders]);
 
   const filterTabs: FilterTab[] = useMemo(() => {
     const tabs: FilterTab[] = [{ value: 'all', label: '全部' }];
@@ -46,10 +55,6 @@ const OrdersPage: React.FC = () => {
       list = getOrdersByWorker('w001');
     }
 
-    if (activeFilter !== 'all') {
-      list = list.filter((o) => o.status === activeFilter);
-    }
-
     if (isStaff && (searchKeyword || filterType || filterBuilding || filterWorker)) {
       list = searchOrders({
         type: filterType || undefined,
@@ -57,16 +62,22 @@ const OrdersPage: React.FC = () => {
         building: filterBuilding || undefined,
         workerName: filterWorker || undefined,
       });
-      if (activeFilter !== 'all') {
-        list = list.filter((o) => o.status === activeFilter);
-      }
       if (userInfo.role === 'worker') {
         list = list.filter((o) => o.workerId === 'w001');
       }
     }
 
+    if (activeFilter !== 'all') {
+      list = list.filter((o) => o.status === activeFilter);
+    }
+
     return list.sort((a, b) => new Date(b.createTime).getTime() - new Date(a.createTime).getTime());
   }, [userInfo, activeFilter, orders, searchKeyword, filterType, filterBuilding, filterWorker, isStaff, searchOrders, getOrdersByOwner, getOrdersByWorker]);
+
+  const pendingOrders = useMemo(
+    () => filteredOrders.filter((o) => o.status === 'pending'),
+    [filteredOrders],
+  );
 
   const hasActiveFilters = isStaff && (filterType || filterBuilding || filterWorker || searchKeyword);
 
@@ -77,28 +88,80 @@ const OrdersPage: React.FC = () => {
     setSearchKeyword('');
   };
 
-  const buildings = ['1栋', '2栋', '3栋', '4栋', '5栋', '6栋'];
-  const workers = ['李师傅', '王师傅', '张师傅', '陈师傅', '刘师傅'];
+  const toggleSelect = (orderId: string) => {
+    setSelectedIds((prev) =>
+      prev.includes(orderId) ? prev.filter((id) => id !== orderId) : [...prev, orderId],
+    );
+  };
+
+  const selectAllPending = () => {
+    const pendingIds = pendingOrders.map((o) => o.id);
+    if (selectedIds.length === pendingIds.length && selectedIds.length > 0) {
+      setSelectedIds([]);
+    } else {
+      setSelectedIds(pendingIds);
+    }
+  };
+
+  const exitBatchMode = () => {
+    setBatchMode(false);
+    setSelectedIds([]);
+  };
+
+  const goBatchAssign = () => {
+    if (selectedIds.length === 0) {
+      Taro.showToast({ title: '请先选择工单', icon: 'none' });
+      return;
+    }
+    Taro.navigateTo({
+      url: `/pages/batch-assign/index?orderIds=${selectedIds.join(',')}`,
+    });
+  };
+
+  const goToDetail = (id: string) => {
+    Taro.navigateTo({ url: `/pages/order-detail/index?id=${id}` });
+  };
+
+  const renderOrderItem = (order: RepairOrder) => {
+    if (batchMode && order.status === 'pending') {
+      const isSelected = selectedIds.includes(order.id);
+      return (
+        <View key={order.id} className={styles.batchOrderItem} onClick={() => toggleSelect(order.id)}>
+          <View className={classnames(styles.checkbox, isSelected && styles.checkboxChecked)}>
+            {isSelected && <Text className={styles.checkIcon}>✓</Text>}
+          </View>
+          <View style={{ flex: 1 }}>
+            <OrderCard order={order} />
+          </View>
+        </View>
+      );
+    }
+    return (
+      <View key={order.id} onClick={() => goToDetail(order.id)}>
+        <OrderCard order={order} />
+      </View>
+    );
+  };
 
   return (
     <ScrollView className={styles.page} scrollY refresherEnabled onRefresh={() => setTimeout(() => Taro.stopPullDownRefresh(), 1000)}>
-      {isStaff && (
+      {isStaff && !batchMode && (
         <View className={styles.searchBar}>
           <Input
             className={styles.searchInput}
-            placeholder="搜索工单号、标题、业主、房号..."
+            placeholder="搜索工单号、标题、业主、楼栋、房号、师傅..."
             value={searchKeyword}
             onInput={(e) => setSearchKeyword(e.detail.value)}
             confirmType="search"
           />
           <View className={styles.filterToggle} onClick={() => setShowFilters(!showFilters)}>
-            <Text className={styles.filterIcon}>🔍</Text>
+            <Text className={styles.filterIcon}>⚙️</Text>
             {hasActiveFilters && <View className={styles.filterBadge} />}
           </View>
         </View>
       )}
 
-      {isStaff && showFilters && (
+      {isStaff && !batchMode && showFilters && (
         <View className={styles.filterPanel}>
           <View className={styles.filterGroup}>
             <Text className={styles.filterLabel}>报修类型</Text>
@@ -130,7 +193,7 @@ const OrdersPage: React.FC = () => {
               >
                 <Text>全部</Text>
               </View>
-              {buildings.map((b) => (
+              {buildingNames.map((b) => (
                 <View
                   key={b}
                   className={classnames(styles.chip, filterBuilding === b && styles.chipActive)}
@@ -151,7 +214,7 @@ const OrdersPage: React.FC = () => {
               >
                 <Text>全部</Text>
               </View>
-              {workers.map((w) => (
+              {workerNames.map((w) => (
                 <View
                   key={w}
                   className={classnames(styles.chip, filterWorker === w && styles.chipActive)}
@@ -173,6 +236,26 @@ const OrdersPage: React.FC = () => {
         </View>
       )}
 
+      {batchMode && (
+        <View className={styles.batchHeader}>
+          <View className={styles.batchTitle}>
+            <Text>批量派单</Text>
+            <Text className={styles.batchCount}>已选 {selectedIds.length} 单</Text>
+          </View>
+          <View className={styles.batchActions}>
+            <View className={styles.batchBtnSecondary} onClick={exitBatchMode}>
+              <Text>取消</Text>
+            </View>
+            <View
+              className={classnames(styles.batchBtnPrimary, selectedIds.length === 0 && styles.batchBtnDisabled)}
+              onClick={selectedIds.length > 0 ? goBatchAssign : undefined}
+            >
+              <Text>下一步</Text>
+            </View>
+          </View>
+        </View>
+      )}
+
       <View className={styles.filterBar}>
         {filterTabs.map((tab) => {
           const count = filteredOrders.filter((o) => tab.value === 'all' || o.status === tab.value).length;
@@ -191,15 +274,35 @@ const OrdersPage: React.FC = () => {
         })}
       </View>
 
-      {hasActiveFilters && (
+      {batchMode && (
+        <View className={styles.selectAllRow}>
+          <View className={styles.selectAllLeft} onClick={selectAllPending}>
+            <View className={classnames(styles.checkbox, selectedIds.length === pendingOrders.length && pendingOrders.length > 0 && styles.checkboxChecked)}>
+              {selectedIds.length === pendingOrders.length && pendingOrders.length > 0 && <Text className={styles.checkIcon}>✓</Text>}
+            </View>
+            <Text className={styles.selectAllText}>全选待派单工单</Text>
+          </View>
+          <Text className={styles.selectAllHint}>仅可选择待派单工单进行批量派单</Text>
+        </View>
+      )}
+
+      {hasActiveFilters && !batchMode && (
         <View className={styles.resultInfo}>
           <Text>筛选结果：共 {filteredOrders.length} 条工单</Text>
         </View>
       )}
 
+      {isStaff && !batchMode && activeFilter === 'pending' && pendingOrders.length > 0 && (
+        <View className={styles.batchEntry} onClick={() => setBatchMode(true)}>
+          <Text className={styles.batchEntryIcon}>📋</Text>
+          <Text className={styles.batchEntryText}>批量派单模式（当前 {pendingOrders.length} 单待派）</Text>
+          <Text className={styles.batchEntryArrow}>›</Text>
+        </View>
+      )}
+
       <View className={styles.orderList}>
         {filteredOrders.length > 0 ? (
-          filteredOrders.map((order) => <OrderCard key={order.id} order={order} />)
+          filteredOrders.map((order) => renderOrderItem(order))
         ) : (
           <EmptyState
             title="暂无工单"

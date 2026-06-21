@@ -2,18 +2,49 @@ import React, { useMemo } from 'react';
 import { View, Text, Image, ScrollView } from '@tarojs/components';
 import Taro from '@tarojs/taro';
 import classnames from 'classnames';
+import dayjs from 'dayjs';
 import { useUserStore } from '@/store/useUserStore';
 import { useOrderStore } from '@/store/useOrderStore';
-import { USER_ROLE_OPTIONS, getUserRoleLabel } from '@/utils/constants';
+import { USER_ROLE_OPTIONS, getUserRoleLabel, getRepairTypeLabel } from '@/utils/constants';
 import { formatDuration } from '@/utils/format';
 import OrderCard from '@/components/OrderCard';
 import StatCard from '@/components/StatCard';
 import EmptyState from '@/components/EmptyState';
 import styles from './index.module.scss';
 
+const PROCESS_TIMEOUT_MINUTES = 240;
+const NEAR_TIMEOUT_MINUTES = 180;
+
 const HomePage: React.FC = () => {
   const { userInfo, setRole } = useUserStore();
-  const { orders, getOrdersByStatus, getOrdersByWorker, getOrdersByOwner } = useOrderStore();
+  const { orders, getOrdersByStatus, getOrdersByWorker, getOrdersByOwner, startOrder } = useOrderStore();
+
+  const workerTasks = useMemo(() => {
+    if (userInfo.role !== 'worker') return null;
+    const myOrders = getOrdersByWorker('w001');
+    const pending = myOrders.filter((o) => o.status === 'assigned');
+    const processing = myOrders.filter((o) => o.status === 'processing');
+    const now = dayjs();
+    const nearTimeout = processing.filter((o) => {
+      if (!o.startTime) return false;
+      const diff = now.diff(dayjs(o.startTime), 'minute');
+      return diff >= NEAR_TIMEOUT_MINUTES && diff < PROCESS_TIMEOUT_MINUTES;
+    });
+    const urgent = processing.filter((o) => {
+      if (!o.startTime) return false;
+      return now.diff(dayjs(o.startTime), 'minute') >= PROCESS_TIMEOUT_MINUTES;
+    });
+    return {
+      pending,
+      processing,
+      nearTimeout,
+      urgent,
+      totalToday: myOrders.filter((o) => {
+        if (!o.completeTime) return false;
+        return dayjs(o.completeTime).isSame(dayjs(), 'day');
+      }).length,
+    };
+  }, [userInfo.role, orders, getOrdersByWorker]);
 
   const displayOrders = useMemo(() => {
     if (userInfo.role === 'owner') {
@@ -66,6 +97,23 @@ const HomePage: React.FC = () => {
 
   const goToStatistics = () => {
     Taro.navigateTo({ url: '/pages/statistics/index' });
+  };
+
+  const handleStartOrder = (orderId: string) => {
+    Taro.showModal({
+      title: '确认开始处理',
+      content: '确认开始处理此工单吗？开始后将计时。',
+      success: (res) => {
+        if (res.confirm) {
+          startOrder(orderId);
+          Taro.showToast({ title: '已开始处理', icon: 'success' });
+        }
+      },
+    });
+  };
+
+  const goToOrderDetail = (orderId: string) => {
+    Taro.navigateTo({ url: `/pages/order-detail/index?id=${orderId}` });
   };
 
   const quickActions = [
@@ -150,24 +198,179 @@ const HomePage: React.FC = () => {
           </View>
         )}
 
-        <View className={styles.section}>
-          <View className={styles.sectionHeader}>
-            <Text className={styles.sectionTitle}>
-              {userInfo.role === 'owner' ? '我的工单' : userInfo.role === 'worker' ? '我的待办' : '最新工单'}
-            </Text>
-            <Text className={styles.moreLink} onClick={goToOrders}>
-              查看全部 ›
-            </Text>
+        {userInfo.role === 'worker' && workerTasks && (
+          <View className={styles.section}>
+            <View className={styles.sectionHeader}>
+              <Text className={styles.sectionTitle}>今日任务看板</Text>
+              <Text className={styles.todayBadge}>今日完成 {workerTasks.totalToday} 单</Text>
+            </View>
+
+            {workerTasks.urgent.length > 0 && (
+              <View className={styles.taskGroup}>
+                <View className={styles.taskGroupHeader}>
+                  <Text className={classnames(styles.taskGroupTitle, styles.taskUrgent)}>
+                    🔴 超时预警
+                  </Text>
+                  <Text className={styles.taskGroupCount}>{workerTasks.urgent.length}单</Text>
+                </View>
+                {workerTasks.urgent.slice(0, 3).map((order) => (
+                  <View key={order.id} className={styles.taskCard} onClick={() => goToOrderDetail(order.id)}>
+                    <View style={{ flex: 1 }}>
+                      <View className={styles.taskTop}>
+                        <Text className={styles.taskTitle}>{order.title}</Text>
+                        <View className={styles.urgentBadge}>
+                          <Text>超时</Text>
+                        </View>
+                      </View>
+                      <Text className={styles.taskMeta}>
+                        {getRepairTypeLabel(order.type)} · {order.ownerInfo.building}{order.ownerInfo.room}
+                      </Text>
+                    </View>
+                    <View
+                      className={classnames(styles.taskBtn, styles.taskBtnPrimary)}
+                      onClick={(e) => { e.stopPropagation(); handleStartOrder(order.id); }}
+                    >
+                      <Text>继续</Text>
+                    </View>
+                  </View>
+                ))}
+              </View>
+            )}
+
+            {workerTasks.nearTimeout.length > 0 && (
+              <View className={styles.taskGroup}>
+                <View className={styles.taskGroupHeader}>
+                  <Text className={classnames(styles.taskGroupTitle, styles.taskWarning)}>
+                    🟡 即将超时
+                  </Text>
+                  <Text className={styles.taskGroupCount}>{workerTasks.nearTimeout.length}单</Text>
+                </View>
+                {workerTasks.nearTimeout.slice(0, 3).map((order) => (
+                  <View key={order.id} className={styles.taskCard} onClick={() => goToOrderDetail(order.id)}>
+                    <View style={{ flex: 1 }}>
+                      <View className={styles.taskTop}>
+                        <Text className={styles.taskTitle}>{order.title}</Text>
+                        <View className={styles.warningBadge}>
+                          <Text>快超时</Text>
+                        </View>
+                      </View>
+                      <Text className={styles.taskMeta}>
+                        {getRepairTypeLabel(order.type)} · {order.ownerInfo.building}{order.ownerInfo.room}
+                      </Text>
+                    </View>
+                    <View
+                      className={classnames(styles.taskBtn, styles.taskBtnPrimary)}
+                      onClick={(e) => { e.stopPropagation(); handleStartOrder(order.id); }}
+                    >
+                      <Text>继续</Text>
+                    </View>
+                  </View>
+                ))}
+              </View>
+            )}
+
+            {workerTasks.processing.filter((o) => {
+              if (!o.startTime) return true;
+              const diff = dayjs().diff(dayjs(o.startTime), 'minute');
+              return diff < NEAR_TIMEOUT_MINUTES;
+            }).length > 0 && (
+              <View className={styles.taskGroup}>
+                <View className={styles.taskGroupHeader}>
+                  <Text className={classnames(styles.taskGroupTitle, styles.taskProcessing)}>
+                    🔵 处理中
+                  </Text>
+                  <Text className={styles.taskGroupCount}>
+                    {workerTasks.processing.filter((o) => {
+                      if (!o.startTime) return true;
+                      return dayjs().diff(dayjs(o.startTime), 'minute') < NEAR_TIMEOUT_MINUTES;
+                    }).length}单
+                  </Text>
+                </View>
+                {workerTasks.processing
+                  .filter((o) => {
+                    if (!o.startTime) return true;
+                    return dayjs().diff(dayjs(o.startTime), 'minute') < NEAR_TIMEOUT_MINUTES;
+                  })
+                  .slice(0, 3)
+                  .map((order) => (
+                    <View key={order.id} className={styles.taskCard} onClick={() => goToOrderDetail(order.id)}>
+                      <View style={{ flex: 1 }}>
+                        <Text className={styles.taskTitle}>{order.title}</Text>
+                        <Text className={styles.taskMeta}>
+                          {getRepairTypeLabel(order.type)} · {order.ownerInfo.building}{order.ownerInfo.room}
+                        </Text>
+                      </View>
+                      <View
+                        className={classnames(styles.taskBtn, styles.taskBtnPrimary)}
+                        onClick={(e) => { e.stopPropagation(); handleStartOrder(order.id); }}
+                      >
+                        <Text>继续</Text>
+                      </View>
+                    </View>
+                  ))}
+              </View>
+            )}
+
+            {workerTasks.pending.length > 0 && (
+              <View className={styles.taskGroup}>
+                <View className={styles.taskGroupHeader}>
+                  <Text className={classnames(styles.taskGroupTitle, styles.taskPending)}>
+                    📋 待处理
+                  </Text>
+                  <Text className={styles.taskGroupCount}>{workerTasks.pending.length}单</Text>
+                </View>
+                {workerTasks.pending.slice(0, 5).map((order) => (
+                  <View key={order.id} className={styles.taskCard} onClick={() => goToOrderDetail(order.id)}>
+                    <View style={{ flex: 1 }}>
+                      <Text className={styles.taskTitle}>{order.title}</Text>
+                      <Text className={styles.taskMeta}>
+                        {getRepairTypeLabel(order.type)} · {order.ownerInfo.building}{order.ownerInfo.room}
+                      </Text>
+                    </View>
+                    <View
+                      className={classnames(styles.taskBtn, styles.taskBtnPrimary)}
+                      onClick={(e) => { e.stopPropagation(); handleStartOrder(order.id); }}
+                    >
+                      <Text>开始</Text>
+                    </View>
+                  </View>
+                ))}
+              </View>
+            )}
+
+            {workerTasks.pending.length === 0 && workerTasks.processing.length === 0 && (
+              <EmptyState
+                title="今日暂无任务"
+                description="休息一下，等待新的工单分配"
+              />
+            )}
+
+            <View className={styles.viewAllBtn} onClick={goToOrders}>
+              <Text>查看全部工单 ›</Text>
+            </View>
           </View>
-          {displayOrders.length > 0 ? (
-            displayOrders.map((order) => <OrderCard key={order.id} order={order} />)
-          ) : (
-            <EmptyState
-              title={userInfo.role === 'worker' ? '暂无待办工单' : '暂无工单记录'}
-              description={userInfo.role === 'owner' ? '点击上方快速报修提交申请' : '等待新的工单分配'}
-            />
-          )}
-        </View>
+        )}
+
+        {userInfo.role !== 'worker' && (
+          <View className={styles.section}>
+            <View className={styles.sectionHeader}>
+              <Text className={styles.sectionTitle}>
+                {userInfo.role === 'owner' ? '我的工单' : '最新工单'}
+              </Text>
+              <Text className={styles.moreLink} onClick={goToOrders}>
+                查看全部 ›
+              </Text>
+            </View>
+            {displayOrders.length > 0 ? (
+              displayOrders.map((order) => <OrderCard key={order.id} order={order} />)
+            ) : (
+              <EmptyState
+                title="暂无工单记录"
+                description={userInfo.role === 'owner' ? '点击上方快速报修提交申请' : '等待新的工单分配'}
+              />
+            )}
+          </View>
+        )}
 
         {(userInfo.role === 'manager' || userInfo.role === 'customer_service') && (
           <View className={styles.section} onClick={goToTimeout}>
