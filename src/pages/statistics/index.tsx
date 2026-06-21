@@ -1,27 +1,130 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { View, Text, ScrollView } from '@tarojs/components';
 import Taro from '@tarojs/taro';
 import classnames from 'classnames';
-import { statisticsData } from '@/data/statistics';
+import dayjs from 'dayjs';
+import { useOrderStore } from '@/store/useOrderStore';
 import StatCard from '@/components/StatCard';
-import { formatDuration } from '@/utils/format';
+import { getRepairTypeLabel, getOrderStatusLabel } from '@/utils/constants';
+import { formatDuration, formatDateTime } from '@/utils/format';
 import styles from './index.module.scss';
 
 const StatisticsPage: React.FC = () => {
-  const data = statisticsData;
+  const { orders, getStatistics } = useOrderStore();
+  const data = useMemo(() => getStatistics(), [orders]);
   const maxTypeCount = Math.max(...data.typeStatistics.map((t) => t.count), 1);
+
+  const generateCSV = (): string => {
+    const headers = [
+      '工单号',
+      '报修类型',
+      '报修标题',
+      '报修描述',
+      '工单状态',
+      '业主姓名',
+      '联系电话',
+      '房屋信息',
+      '提交时间',
+      '派单时间',
+      '开始处理时间',
+      '完成时间',
+      '响应时长(分钟)',
+      '处理时长(分钟)',
+      '维修师傅',
+      '维修说明',
+      '满意度评分',
+      '评价内容',
+    ];
+
+    const rows = orders.map((order) => [
+      order.orderNo,
+      getRepairTypeLabel(order.type),
+      order.title || '',
+      (order.description || '').replace(/[\r\n]/g, ' '),
+      getOrderStatusLabel(order.status),
+      order.ownerInfo?.name || '',
+      order.ownerInfo?.phone || '',
+      `${order.ownerInfo?.building || ''}${order.ownerInfo?.room || ''}`,
+      order.createTime || '',
+      order.assignTime || '',
+      order.startTime || '',
+      order.completeTime || '',
+      order.responseMinutes ?? '',
+      order.processMinutes ?? '',
+      order.workerName || '',
+      (order.resultDescription || '').replace(/[\r\n]/g, ' '),
+      order.rating || '',
+      (order.ratingComment || '').replace(/[\r\n]/g, ' '),
+    ]);
+
+    const csvContent = [
+      headers.join(','),
+      ...rows.map((row) =>
+        row.map((cell) => {
+          const str = String(cell);
+          if (str.includes(',') || str.includes('"') || str.includes('\n')) {
+            return `"${str.replace(/"/g, '""')}"`;
+          }
+          return str;
+        }).join(',')
+      ),
+    ].join('\n');
+
+    return '\uFEFF' + csvContent;
+  };
 
   const handleExport = () => {
     Taro.showModal({
       title: '导出报表',
-      content: '确认导出报修工单明细报表？报表将包含工单详情、处理时长、满意度评价等信息。',
+      content: `确认导出 ${orders.length} 条报修工单明细报表？\n报表包含工单详情、处理时长、满意度评价等信息。`,
       success: (res) => {
         if (res.confirm) {
           Taro.showLoading({ title: '生成报表中...' });
           setTimeout(() => {
-            Taro.hideLoading();
-            Taro.showToast({ title: '报表已生成', icon: 'success' });
-          }, 1500);
+            try {
+              const csvContent = generateCSV();
+              const fileName = `报修工单明细_${dayjs().format('YYYYMMDD_HHmmss')}.csv`;
+
+              const fs = Taro.getFileSystemManager();
+              const filePath = `${Taro.env.USER_DATA_PATH}/${fileName}`;
+
+              fs.writeFile({
+                filePath,
+                data: csvContent,
+                encoding: 'utf8',
+                success: () => {
+                  Taro.hideLoading();
+                  Taro.showModal({
+                    title: '导出成功',
+                    content: `报表已生成：${fileName}\n共 ${orders.length} 条记录\n是否打开文件？`,
+                    confirmText: '打开',
+                    cancelText: '知道了',
+                    success: (modalRes) => {
+                      if (modalRes.confirm) {
+                        Taro.openDocument({
+                          filePath,
+                          showMenu: true,
+                          fail: (err) => {
+                            console.error('打开文档失败:', err);
+                            Taro.showToast({ title: '打开失败', icon: 'none' });
+                          },
+                        });
+                      }
+                    },
+                  });
+                },
+                fail: (err) => {
+                  console.error('写入文件失败:', err);
+                  Taro.hideLoading();
+                  Taro.showToast({ title: '生成失败', icon: 'none' });
+                },
+              });
+            } catch (e) {
+              console.error('导出异常:', e);
+              Taro.hideLoading();
+              Taro.showToast({ title: '导出失败', icon: 'none' });
+            }
+          }, 800);
         }
       },
     });
@@ -108,6 +211,24 @@ const StatisticsPage: React.FC = () => {
               </View>
             </View>
           ))}
+      </View>
+
+      <View className={styles.section}>
+        <View className={styles.sectionHeader}>
+          <Text className={styles.sectionTitle}>数据说明</Text>
+        </View>
+        <Text className={styles.noteText}>
+          · 数据基于已完成的工单自动计算
+        </Text>
+        <Text className={styles.noteText}>
+          · 响应时间 = 派单时间 - 提交时间
+        </Text>
+        <Text className={styles.noteText}>
+          · 处理时间 = 完成时间 - 开始处理时间
+        </Text>
+        <Text className={styles.noteText}>
+          · 统计数据随工单状态实时更新
+        </Text>
       </View>
     </ScrollView>
   );

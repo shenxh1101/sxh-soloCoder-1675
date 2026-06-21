@@ -8,7 +8,7 @@ import styles from './index.module.scss';
 
 const ProfilePage: React.FC = () => {
   const { userInfo, setRole } = useUserStore();
-  const { getOrdersByOwner, getOrdersByWorker } = useOrderStore();
+  const { orders, getOrdersByOwner, getOrdersByWorker } = useOrderStore();
 
   const stats = useMemo(() => {
     if (userInfo.role === 'owner') {
@@ -27,7 +27,7 @@ const ProfilePage: React.FC = () => {
       };
     }
     return { total: 0, processing: 0, completed: 0 };
-  }, [userInfo, getOrdersByOwner, getOrdersByWorker]);
+  }, [userInfo, orders, getOrdersByOwner, getOrdersByWorker]);
 
   const goToOrders = () => Taro.switchTab({ url: '/pages/orders/index' });
   const goToStatistics = () => Taro.navigateTo({ url: '/pages/statistics/index' });

@@ -5,6 +5,7 @@ import classnames from 'classnames';
 import { useUserStore } from '@/store/useUserStore';
 import { useOrderStore } from '@/store/useOrderStore';
 import { USER_ROLE_OPTIONS, getUserRoleLabel } from '@/utils/constants';
+import { formatDuration } from '@/utils/format';
 import OrderCard from '@/components/OrderCard';
 import StatCard from '@/components/StatCard';
 import EmptyState from '@/components/EmptyState';
@@ -29,6 +30,24 @@ const HomePage: React.FC = () => {
     const completed = getOrdersByStatus('completed').length;
     return { pending, processing, completed, total: orders.length };
   }, [orders, getOrdersByStatus]);
+
+  const managerStats = useMemo(() => {
+    const completedOrders = orders.filter((o) => o.status === 'completed');
+    const responseTimes = completedOrders
+      .filter((o) => o.responseMinutes !== undefined)
+      .map((o) => o.responseMinutes as number);
+    const processTimes = completedOrders
+      .filter((o) => o.processMinutes !== undefined)
+      .map((o) => o.processMinutes as number);
+    return {
+      avgResponseMinutes: responseTimes.length > 0
+        ? Math.round(responseTimes.reduce((a, b) => a + b, 0) / responseTimes.length)
+        : 0,
+      avgProcessMinutes: processTimes.length > 0
+        ? Math.round(processTimes.reduce((a, b) => a + b, 0) / processTimes.length)
+        : 0,
+    };
+  }, [orders]);
 
   const goToRepair = (type?: string) => {
     const url = type ? `/pages/repair/index?type=${type}` : '/pages/repair/index';
@@ -120,8 +139,8 @@ const HomePage: React.FC = () => {
             </View>
             {userInfo.role === 'manager' && (
               <View className={styles.statsRow}>
-                <StatCard value="18分" label="平均响应" variant="primary" />
-                <StatCard value="52分" label="平均处理" variant="success" />
+                <StatCard value={formatDuration(managerStats.avgResponseMinutes)} label="平均响应" variant="primary" />
+                <StatCard value={formatDuration(managerStats.avgProcessMinutes)} label="平均处理" variant="success" />
               </View>
             )}
           </View>

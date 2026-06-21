@@ -159,3 +159,10 @@
   font-size: $font-size-xs;
   color: $color-text-tertiary;
 }
+
+.noteText {
+  display: block;
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+  line-height: 1.8;
+}

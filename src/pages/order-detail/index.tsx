@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { View, Text, Image, ScrollView, Textarea, Input } from '@tarojs/components';
-import Taro, { useRouter } from '@tarojs/taro';
+import Taro, { useRouter, useDidShow } from '@tarojs/taro';
 import classnames from 'classnames';
 import { useUserStore } from '@/store/useUserStore';
 import { useOrderStore } from '@/store/useOrderStore';
@@ -12,17 +12,21 @@ import styles from './index.module.scss';
 
 const OrderDetailPage: React.FC = () => {
   const router = useRouter();
+  const orderId = router.params.id || '';
   const { userInfo } = useUserStore();
-  const { getOrderById, startOrder, completeOrder, cancelOrder } = useOrderStore();
-  const [order, setOrder] = useState(getOrderById(router.params.id || ''));
+  const { orders, startOrder, completeOrder, cancelOrder, rateOrder } = useOrderStore();
   const [showCompleteForm, setShowCompleteForm] = useState(false);
   const [resultDescription, setResultDescription] = useState('');
   const [resultImages, setResultImages] = useState<string[]>([]);
 
-  useEffect(() => {
-    const id = router.params.id || '';
-    setOrder(getOrderById(id));
-  }, [router.params.id, getOrderById]);
+  const order = useMemo(
+    () => orders.find((o) => o.id === orderId),
+    [orders, orderId],
+  );
+
+  useDidShow(() => {
+    console.log('[OrderDetail] 页面显示，刷新数据');
+  });
 
   if (!order) {
     return (
@@ -43,7 +47,6 @@ const OrderDetailPage: React.FC = () => {
       success: (res) => {
         if (res.confirm) {
           startOrder(order.id);
-          setOrder(getOrderById(order.id));
           Taro.showToast({ title: '已开始处理', icon: 'success' });
         }
       },
@@ -69,16 +72,18 @@ const OrderDetailPage: React.FC = () => {
   };
 
   const submitComplete = () => {
+    if (resultImages.length === 0) {
+      Taro.showToast({ title: '请上传维修后照片', icon: 'none' });
+      return;
+    }
     if (!resultDescription.trim()) {
       Taro.showToast({ title: '请填写维修说明', icon: 'none' });
       return;
     }
-    const mockImages = resultImages.length > 0
-      ? resultImages
-      : [`https://picsum.photos/id/${Math.floor(Math.random() * 100)}/600/400`];
-    completeOrder(order.id, mockImages, resultDescription.trim());
-    setOrder(getOrderById(order.id));
+    completeOrder(order.id, resultImages, resultDescription.trim());
     setShowCompleteForm(false);
+    setResultDescription('');
+    setResultImages([]);
     Taro.showToast({ title: '工单已完成', icon: 'success' });
   };
 
@@ -90,7 +95,6 @@ const OrderDetailPage: React.FC = () => {
       success: (res) => {
         if (res.confirm) {
           cancelOrder(order.id);
-          setOrder(getOrderById(order.id));
           Taro.showToast({ title: '工单已取消', icon: 'none' });
         }
       },
@@ -251,7 +255,7 @@ const OrderDetailPage: React.FC = () => {
             />
           </View>
           <View>
-            <Text className={styles.infoLabel} style={{ display: 'block', marginBottom: 8 }}>维修后照片</Text>
+            <Text className={styles.infoLabel} style={{ display: 'block', marginBottom: 8 }}>维修后照片 *</Text>
             <View className={styles.imageList}>
               {resultImages.map((img, idx) => (
                 <View className={styles.imageItem} key={idx}>
