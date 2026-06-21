@@ -227,3 +227,20 @@
   font-size: $font-size-sm;
   color: $color-text-tertiary;
 }
+
+.timeoutTip {
+  background-color: rgba($color-warning, 0.08);
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  border: 2rpx dashed rgba($color-warning, 0.3);
+
+  &:active {
+    opacity: 0.8;
+  }
+}
+
+.timeoutTipText {
+  font-size: $font-size-sm;
+  color: $color-warning;
+  line-height: 1.6;
+}

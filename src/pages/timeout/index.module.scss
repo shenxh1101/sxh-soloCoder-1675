@@ -1,0 +1,281 @@
+@use '@/styles/variables.scss' as *;
+
+.page {
+  min-height: 100vh;
+  background-color: $color-bg-page;
+  padding-bottom: $spacing-xl * 2;
+}
+
+.header {
+  padding: $spacing-xl $page-padding $spacing-lg;
+  background: linear-gradient(135deg, $color-primary 0%, $color-primary-light 100%);
+}
+
+.title {
+  display: block;
+  font-size: $font-size-xl;
+  font-weight: $font-weight-bold;
+  color: $color-text-white;
+  margin-bottom: $spacing-xs;
+}
+
+.subtitle {
+  font-size: $font-size-sm;
+  color: rgba($color-text-white, 0.8);
+}
+
+.settingsCard {
+  margin: $spacing-lg $page-padding;
+  padding: $spacing-lg;
+  background-color: $color-bg-card;
+  border-radius: $radius-lg;
+  box-shadow: $shadow-card;
+}
+
+.settingsLabel {
+  display: block;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  margin-bottom: $spacing-md;
+}
+
+.settingsRow {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+}
+
+.settingItem {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-sm;
+}
+
+.settingLabel {
+  font-size: $font-size-xs;
+  color: $color-text-secondary;
+}
+
+.settingBtns {
+  display: flex;
+  gap: $spacing-sm;
+}
+
+.settingBtn {
+  flex: 1;
+  padding: $spacing-sm $spacing-md;
+  background-color: $color-bg-hover;
+  border-radius: $radius-button;
+  text-align: center;
+  transition: all $transition-base;
+
+  &:active {
+    opacity: 0.8;
+  }
+
+  Text {
+    font-size: $font-size-xs;
+    color: $color-text-secondary;
+  }
+}
+
+.settingBtnActive {
+  background-color: $color-primary;
+
+  Text {
+    color: $color-text-white;
+    font-weight: $font-weight-medium;
+  }
+}
+
+.tabBar {
+  display: flex;
+  margin: 0 $page-padding $spacing-lg;
+  background-color: $color-bg-card;
+  border-radius: $radius-lg;
+  box-shadow: $shadow-card;
+  overflow: hidden;
+}
+
+.tabItem {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: $spacing-md $spacing-sm;
+  position: relative;
+  transition: all $transition-base;
+
+  &:active {
+    opacity: 0.8;
+  }
+}
+
+.tabItemActive {
+  background-color: $color-primary-bg;
+}
+
+.tabIcon {
+  font-size: $font-size-lg;
+  margin-bottom: 4rpx;
+}
+
+.tabText {
+  font-size: $font-size-xs;
+  color: $color-text-secondary;
+}
+
+.tabItemActive .tabText {
+  color: $color-primary;
+  font-weight: $font-weight-medium;
+}
+
+.tabBadge {
+  position: absolute;
+  top: $spacing-sm;
+  right: $spacing-lg;
+  min-width: 32rpx;
+  height: 32rpx;
+  padding: 0 8rpx;
+  background-color: $color-error;
+  border-radius: 16rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  Text {
+    font-size: 20rpx;
+    color: $color-text-white;
+    font-weight: $font-weight-bold;
+  }
+}
+
+.orderList {
+  padding: 0 $page-padding;
+}
+
+.orderCard {
+  background-color: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  margin-bottom: $spacing-md;
+  box-shadow: $shadow-card;
+  border-left: 8rpx solid $color-error;
+}
+
+.orderHeader {
+  display: flex;
+  align-items: flex-start;
+  gap: $spacing-md;
+  margin-bottom: $spacing-md;
+}
+
+.orderTopRow {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  margin-bottom: 4rpx;
+}
+
+.orderNo {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+}
+
+.orderTitle {
+  display: block;
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  margin-bottom: 4rpx;
+}
+
+.orderType {
+  font-size: $font-size-xs;
+  color: $color-primary;
+}
+
+.timeoutBadge {
+  flex-shrink: 0;
+  padding: $spacing-xs $spacing-sm;
+  background-color: rgba($color-error, 0.1);
+  border-radius: $radius-xs;
+}
+
+.timeoutBadgeText {
+  font-size: $font-size-xs;
+  color: $color-error;
+  font-weight: $font-weight-semibold;
+}
+
+.orderInfo {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-md;
+  margin-bottom: $spacing-md;
+  padding-bottom: $spacing-md;
+  border-bottom: 1rpx solid $color-divider;
+}
+
+.infoItem {
+  font-size: $font-size-xs;
+  color: $color-text-secondary;
+}
+
+.workerRow {
+  display: flex;
+  align-items: center;
+  margin-bottom: $spacing-md;
+}
+
+.workerLabel {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+}
+
+.workerName {
+  font-size: $font-size-xs;
+  color: $color-primary;
+  font-weight: $font-weight-medium;
+}
+
+.orderActions {
+  display: flex;
+  gap: $spacing-md;
+}
+
+.actionBtn {
+  flex: 1;
+  height: 72rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: $radius-button;
+  transition: all $transition-base;
+
+  &:active {
+    opacity: 0.8;
+  }
+
+  Text {
+    font-size: $font-size-sm;
+    font-weight: $font-weight-medium;
+  }
+}
+
+.btnSecondary {
+  background-color: $color-bg-hover;
+
+  Text {
+    color: $color-text-secondary;
+  }
+}
+
+.btnPrimary {
+  background-color: $color-primary;
+
+  Text {
+    color: $color-text-white;
+  }
+}

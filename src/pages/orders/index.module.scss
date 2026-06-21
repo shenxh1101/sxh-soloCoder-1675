@@ -5,6 +5,120 @@
   background-color: $color-bg-page;
 }
 
+.searchBar {
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+  padding: $spacing-md $page-padding;
+  background-color: $color-bg-card;
+  border-bottom: 1rpx solid $color-divider;
+}
+
+.searchInput {
+  flex: 1;
+  height: 72rpx;
+  padding: 0 $spacing-lg;
+  background-color: $color-bg-hover;
+  border-radius: $radius-button;
+  font-size: $font-size-sm;
+  color: $color-text-primary;
+}
+
+.filterToggle {
+  position: relative;
+  width: 72rpx;
+  height: 72rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: $color-primary-bg;
+  border-radius: $radius-button;
+
+  &:active {
+    opacity: 0.8;
+  }
+}
+
+.filterIcon {
+  font-size: $font-size-lg;
+}
+
+.filterBadge {
+  position: absolute;
+  top: 8rpx;
+  right: 8rpx;
+  width: 16rpx;
+  height: 16rpx;
+  background-color: $color-error;
+  border-radius: 50%;
+}
+
+.filterPanel {
+  background-color: $color-bg-card;
+  padding: $spacing-lg $page-padding;
+  border-bottom: 1rpx solid $color-divider;
+}
+
+.filterGroup {
+  margin-bottom: $spacing-lg;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.filterLabel {
+  display: block;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  color: $color-text-primary;
+  margin-bottom: $spacing-sm;
+}
+
+.chipRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-sm;
+}
+
+.chip {
+  padding: $spacing-xs $spacing-md;
+  background-color: $color-bg-hover;
+  border-radius: $radius-round;
+  font-size: $font-size-xs;
+  color: $color-text-secondary;
+  transition: all $transition-base;
+
+  &:active {
+    opacity: 0.8;
+  }
+}
+
+.chipActive {
+  background-color: $color-primary;
+  color: $color-text-white;
+}
+
+.filterActions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: $spacing-md;
+  padding-top: $spacing-md;
+  border-top: 1rpx solid $color-divider;
+}
+
+.resetBtn {
+  padding: $spacing-xs $spacing-lg;
+  background-color: $color-bg-hover;
+  border-radius: $radius-button;
+  font-size: $font-size-xs;
+  color: $color-text-secondary;
+
+  &:active {
+    opacity: 0.8;
+  }
+}
+
 .filterBar {
   position: sticky;
   top: 0;
@@ -35,6 +149,13 @@
 .filterItemActive {
   background-color: $color-primary;
   color: $color-text-white;
+}
+
+.resultInfo {
+  padding: $spacing-sm $page-padding;
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+  background-color: $color-primary-bg;
 }
 
 .orderList {

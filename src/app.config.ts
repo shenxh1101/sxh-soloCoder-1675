@@ -7,7 +7,8 @@ export default defineAppConfig({
     'pages/order-detail/index',
     'pages/statistics/index',
     'pages/worker-select/index',
-    'pages/rating/index'
+    'pages/rating/index',
+    'pages/timeout/index'
   ],
   window: {
     backgroundTextStyle: 'light',

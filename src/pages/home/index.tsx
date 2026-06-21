@@ -60,6 +60,10 @@ const HomePage: React.FC = () => {
     Taro.switchTab({ url: '/pages/orders/index' });
   };
 
+  const goToTimeout = () => {
+    Taro.navigateTo({ url: '/pages/timeout/index' });
+  };
+
   const goToStatistics = () => {
     Taro.navigateTo({ url: '/pages/statistics/index' });
   };
@@ -164,6 +168,20 @@ const HomePage: React.FC = () => {
             />
           )}
         </View>
+
+        {(userInfo.role === 'manager' || userInfo.role === 'customer_service') && (
+          <View className={styles.section} onClick={goToTimeout}>
+            <View className={styles.sectionHeader}>
+              <Text className={styles.sectionTitle}>超时提醒</Text>
+              <Text className={styles.moreLink}>
+                查看详情 ›
+              </Text>
+            </View>
+            <View className={styles.timeoutTip}>
+              <Text className={styles.timeoutTipText}>⏰ 查看超时未派单和处理超时的工单，及时处理避免投诉</Text>
+            </View>
+          </View>
+        )}
 
         {userInfo.role === 'manager' && (
           <View className={styles.section}>

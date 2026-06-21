@@ -53,6 +53,22 @@
   color: $color-text-primary;
 }
 
+.loadBadge {
+  padding: 4rpx 12rpx;
+  background-color: rgba($color-error, 0.1);
+  border-radius: $radius-xs;
+
+  &:active {
+    opacity: 0.8;
+  }
+}
+
+.loadBadgeText {
+  font-size: 20rpx;
+  color: $color-error;
+  font-weight: $font-weight-medium;
+}
+
 .phone {
   font-size: $font-size-sm;
   color: $color-text-secondary;

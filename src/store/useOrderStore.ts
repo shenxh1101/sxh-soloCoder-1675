@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import dayjs from 'dayjs';
 import Taro from '@tarojs/taro';
-import type { RepairOrder, OrderStatus, RepairType, StatisticsData, TypeStatistic, WorkerStatistic } from '@/types';
+import type { RepairOrder, OrderStatus, RepairType, StatisticsData, TypeStatistic, WorkerStatistic, WorkerInfo } from '@/types';
 import { ordersData } from '@/data/orders';
 import { workersData } from '@/data/workers';
 import { REPAIR_TYPE_OPTIONS } from '@/utils/constants';
@@ -44,6 +44,18 @@ interface OrderState {
   getOrdersByWorker: (workerId: string) => RepairOrder[];
   getOrdersByOwner: (phone: string) => RepairOrder[];
   getStatistics: () => StatisticsData;
+  getWorkerLoad: () => Array<WorkerInfo & { pendingCount: number; processingCount: number; completedCount: number; totalLoad: number }>;
+  getTimeoutOrders: (timeoutMinutes?: { pending: number; processing: number }) => {
+    pendingTimeout: RepairOrder[];
+    processingTimeout: RepairOrder[];
+  };
+  searchOrders: (filters: {
+    type?: RepairType;
+    status?: OrderStatus;
+    building?: string;
+    workerName?: string;
+    keyword?: string;
+  }) => RepairOrder[];
   createOrder: (data: {
     title: string;
     description: string;
@@ -82,9 +94,10 @@ export const useOrderStore = create<OrderState>((set, get) => ({
 
     const completedOrders = orders.filter((o) => o.status === 'completed');
 
-    const responseTimes = completedOrders
-      .filter((o) => o.responseMinutes !== undefined)
-      .map((o) => o.responseMinutes as number);
+    const ordersWithResponse = orders.filter((o) =>
+      ['assigned', 'processing', 'completed'].includes(o.status) && o.responseMinutes !== undefined,
+    );
+    const responseTimes = ordersWithResponse.map((o) => o.responseMinutes as number);
     const avgResponseMinutes = responseTimes.length > 0
       ? Math.round(responseTimes.reduce((a, b) => a + b, 0) / responseTimes.length)
       : 0;
@@ -99,9 +112,10 @@ export const useOrderStore = create<OrderState>((set, get) => ({
     const typeStatistics: TypeStatistic[] = REPAIR_TYPE_OPTIONS.map((typeOpt) => {
       const typeOrders = orders.filter((o) => o.type === typeOpt.value);
       const typeCompleted = typeOrders.filter((o) => o.status === 'completed');
-      const typeResponseTimes = typeCompleted
-        .filter((o) => o.responseMinutes !== undefined)
-        .map((o) => o.responseMinutes as number);
+      const typeOrdersWithResponse = typeOrders.filter((o) =>
+        ['assigned', 'processing', 'completed'].includes(o.status) && o.responseMinutes !== undefined,
+      );
+      const typeResponseTimes = typeOrdersWithResponse.map((o) => o.responseMinutes as number);
       const typeProcessTimes = typeCompleted
         .filter((o) => o.processMinutes !== undefined)
         .map((o) => o.processMinutes as number);
@@ -302,6 +316,69 @@ export const useOrderStore = create<OrderState>((set, get) => ({
     set({ orders: newOrders });
     saveOrdersToStorage(newOrders);
     console.log('[OrderStore] 取消工单:', orderId);
+  },
+
+  getWorkerLoad: () => {
+    const { orders } = get();
+    return workersData.map((worker) => {
+      const workerOrders = orders.filter((o) => o.workerId === worker.id);
+      const pendingCount = workerOrders.filter((o) => o.status === 'assigned').length;
+      const processingCount = workerOrders.filter((o) => o.status === 'processing').length;
+      const completedCount = workerOrders.filter((o) => o.status === 'completed').length;
+      const totalLoad = pendingCount + processingCount;
+      return {
+        ...worker,
+        pendingCount,
+        processingCount,
+        completedCount,
+        totalLoad,
+      };
+    });
+  },
+
+  getTimeoutOrders: (timeoutMinutes = { pending: 60, processing: 240 }) => {
+    const { orders } = get();
+    const now = dayjs();
+    const pendingTimeout = orders.filter((o) => {
+      if (o.status !== 'pending') return false;
+      const diffMinutes = now.diff(dayjs(o.createTime), 'minute');
+      return diffMinutes > timeoutMinutes.pending;
+    }).sort((a, b) => dayjs(a.createTime).valueOf() - dayjs(b.createTime).valueOf());
+
+    const processingTimeout = orders.filter((o) => {
+      if (o.status !== 'processing' || !o.startTime) return false;
+      const diffMinutes = now.diff(dayjs(o.startTime), 'minute');
+      return diffMinutes > timeoutMinutes.processing;
+    }).sort((a, b) => dayjs(a.startTime).valueOf() - dayjs(b.startTime).valueOf());
+
+    return { pendingTimeout, processingTimeout };
+  },
+
+  searchOrders: (filters) => {
+    let { orders } = get();
+    if (filters.type) {
+      orders = orders.filter((o) => o.type === filters.type);
+    }
+    if (filters.status) {
+      orders = orders.filter((o) => o.status === filters.status);
+    }
+    if (filters.building) {
+      orders = orders.filter((o) => o.ownerInfo.building.includes(filters.building!));
+    }
+    if (filters.workerName) {
+      orders = orders.filter((o) => o.workerName?.includes(filters.workerName!));
+    }
+    if (filters.keyword) {
+      const kw = filters.keyword.toLowerCase();
+      orders = orders.filter((o) =>
+        o.title.toLowerCase().includes(kw) ||
+        o.description.toLowerCase().includes(kw) ||
+        o.orderNo.toLowerCase().includes(kw) ||
+        o.ownerInfo.name.toLowerCase().includes(kw) ||
+        o.ownerInfo.room.toLowerCase().includes(kw),
+      );
+    }
+    return orders.sort((a, b) => new Date(b.createTime).getTime() - new Date(a.createTime).getTime());
   },
 
   resetOrders: () => {
